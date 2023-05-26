@@ -3,15 +3,14 @@
 	"id": "youwereslain",
 	"version": "${version}",
 	"name": "You were slain...",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Customize the death screen. Includes respawn delay.",
 	"authors": [
-		"Me!"
+		"Superkat32"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/Superkat32/YouWereSlain"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/youwereslain/icon.png",
 	"environment": "*",
 	"entrypoints": {
