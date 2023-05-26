@@ -16,12 +16,16 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"net.superkat.youwereslain.ExampleMod"
+          "net.superkat.youwereslain.YouWereSlainMain"
+		],
+		"client": [
+			"net.superkat.youwereslain.YouWereSlainClient"
 		]
 	},
 	"mixins": [
 		"youwereslain.mixins.json"
 	],
+	"accessWidener": "aw.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.14.20",
 		"minecraft": "~1.19.2",
