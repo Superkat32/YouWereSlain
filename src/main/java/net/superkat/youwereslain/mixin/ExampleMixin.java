@@ -12,26 +12,25 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Iterator;
 import java.util.List;
 
 import static net.superkat.youwereslain.YouWereSlainMain.LOGGER;
 
 @Mixin(DeathScreen.class)
-public class ExampleMixin extends Screen {
+public abstract class ExampleMixin extends Screen {
 
 //	@Shadow @Nullable protected abstract Style getTextComponentUnderMouse(int mouseX);
 
 	public int ticksSinceDeath;
 	//Message is the death message
-	private Text message = Text.literal("You were slain...");
+	private Text message;
 	public final boolean isHardcore;
 	private Text scoreText;
 	public final List<ButtonWidget> buttons = Lists.newArrayList();
 
 	public ExampleMixin(@Nullable Text message, boolean isHardcore) {
-		super(Text.literal(""));
-//		this.message = message;
+		super(Text.of(""));
+		this.message = message;
 		this.isHardcore = isHardcore;
 	}
 
@@ -40,11 +39,12 @@ public class ExampleMixin extends Screen {
 		LOGGER.info("You died...");
 		ticksSinceDeath = 0;
 		this.buttons.clear();
+		this.buttons.removeAll(buttons);
 		//Respawn or spectate button
-		this.buttons.add((ButtonWidget) this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, isHardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), (button) -> {
-			this.client.player.requestRespawn();
-			this.client.setScreen((Screen)null);
-		})));
+//		this.buttons.add((ButtonWidget) this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, isHardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), (button) -> {
+//			this.client.player.requestRespawn();
+//			this.client.setScreen((Screen)null);
+//		})));
 
 		//Exit game button
 //        this.buttons.add((ButtonWidget)this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 96, 200, 20, Text.translatable("deathScreen.titleScreen"), (button) -> {
@@ -57,17 +57,19 @@ public class ExampleMixin extends Screen {
 //            }
 //        })));
 
-		ButtonWidget buttonWidget;
-		for(Iterator var1 = this.buttons.iterator(); var1.hasNext(); buttonWidget.active = false) {
-			buttonWidget = (ButtonWidget)var1.next();
-		}
+//		ButtonWidget buttonWidget;
+//		for(Iterator var1 = this.buttons.iterator(); var1.hasNext(); buttonWidget.active = false) {
+//			buttonWidget = (ButtonWidget)var1.next();
+//		}
 
 //		this.scoreText = Text.translatable("deathScreen.score").append(": ").append(Text.literal(Integer.toString(this.client.player.getScore())).formatted(Formatting.YELLOW));
 		this.scoreText = Text.literal("");
 	}
 
-	@Inject(method = "render", at = @At("RETURN"))
+	@Inject(method = "render", at = @At("HEAD"), cancellable = true)
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+//		super.render(matrices, mouseX, mouseY, delta);
+		ci.cancel();
 		//Red death gradient renderer
 		this.fillGradient(matrices, 0, 0, this.width, this.height, 1615855616, -1602211792);
 		matrices.push();
@@ -76,12 +78,12 @@ public class ExampleMixin extends Screen {
 		drawCenteredText(matrices, this.textRenderer, Text.literal("You were slain..."), this.width / 2 / 2, 30, 16777215);
 		matrices.pop();
 		//Death message text renderer
-		if (this.message != null) {
-			drawCenteredText(matrices, this.textRenderer, this.message, this.width / 2, 85, 16777215);
-		}
+//		if (this.message != null) {
+//			drawCenteredText(matrices, this.textRenderer, this.message, this.width / 2, 85, 16777215);
+//		}
 
 		//Score text renderer
-		drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, 16777215);
+//		drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, 16777215);
 //		if (this.message != null && mouseY > 85) {
 //			Objects.requireNonNull(this.textRenderer);
 //			if (mouseY < 85 + 9) {
@@ -90,7 +92,7 @@ public class ExampleMixin extends Screen {
 //			}
 //		}
 
-		super.render(matrices, mouseX, mouseY, delta);
+//		super.render(matrices, mouseX, mouseY, delta);
 	}
 
 	@Inject(method = "tick", at = @At("RETURN"))
