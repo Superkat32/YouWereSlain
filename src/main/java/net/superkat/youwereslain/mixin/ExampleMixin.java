@@ -22,6 +22,7 @@ public abstract class ExampleMixin extends Screen {
 //	@Shadow @Nullable protected abstract Style getTextComponentUnderMouse(int mouseX);
 
 	public int ticksSinceDeath;
+	String ticksSinceDeathString;
 	//Message is the death message
 	private Text message;
 	public final boolean isHardcore;
@@ -63,7 +64,7 @@ public abstract class ExampleMixin extends Screen {
 //		}
 
 //		this.scoreText = Text.translatable("deathScreen.score").append(": ").append(Text.literal(Integer.toString(this.client.player.getScore())).formatted(Formatting.YELLOW));
-		this.scoreText = Text.literal("");
+//		this.scoreText = Text.literal("");
 	}
 
 	@Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -78,12 +79,12 @@ public abstract class ExampleMixin extends Screen {
 		drawCenteredText(matrices, this.textRenderer, Text.literal("You were slain..."), this.width / 2 / 2, 30, 16777215);
 		matrices.pop();
 		//Death message text renderer
-//		if (this.message != null) {
-//			drawCenteredText(matrices, this.textRenderer, this.message, this.width / 2, 85, 16777215);
-//		}
+		if (this.message != null) {
+			drawCenteredText(matrices, this.textRenderer, this.message, this.width / 2, 85, 16777215);
+		}
 
 		//Score text renderer
-//		drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, 16777215);
+		drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, 16777215);
 //		if (this.message != null && mouseY > 85) {
 //			Objects.requireNonNull(this.textRenderer);
 //			if (mouseY < 85 + 9) {
@@ -99,7 +100,9 @@ public abstract class ExampleMixin extends Screen {
 	public void tick(CallbackInfo ci) {
 		super.tick();
 		++this.ticksSinceDeath;
+		ticksSinceDeathString = String.valueOf(ticksSinceDeath);
 		ButtonWidget buttonWidget;
+		this.scoreText = Text.of(ticksSinceDeathString);
 		if (this.ticksSinceDeath == 100) {
 //			for(Iterator var1 = this.buttons.iterator(); var1.hasNext(); buttonWidget.active = true) {
 //				buttonWidget = (ButtonWidget)var1.next();
