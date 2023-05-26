@@ -23,8 +23,7 @@ public abstract class ExampleMixin extends Screen {
 
 	public int ticksSinceDeath;
 	String ticksSinceDeathString;
-	//Message is the death message
-	private Text message;
+	private Text message; //The player's death message
 	public final boolean isHardcore;
 	private Text scoreText;
 	public final List<ButtonWidget> buttons = Lists.newArrayList();
@@ -40,6 +39,7 @@ public abstract class ExampleMixin extends Screen {
 		LOGGER.info("You died...");
 		ticksSinceDeath = 0;
 		this.buttons.clear();
+		//I don't think this does anything
 		this.buttons.removeAll(buttons);
 		//Respawn or spectate button
 //		this.buttons.add((ButtonWidget) this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, isHardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), (button) -> {
@@ -63,14 +63,15 @@ public abstract class ExampleMixin extends Screen {
 //			buttonWidget = (ButtonWidget)var1.next();
 //		}
 
+		//Sets the score text
 //		this.scoreText = Text.translatable("deathScreen.score").append(": ").append(Text.literal(Integer.toString(this.client.player.getScore())).formatted(Formatting.YELLOW));
+		//Deletes the score text
 //		this.scoreText = Text.literal("");
 	}
 
 	@Inject(method = "render", at = @At("HEAD"), cancellable = true)
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-//		super.render(matrices, mouseX, mouseY, delta);
-		ci.cancel();
+		ci.cancel(); //Done to prevent the default death screen from rendering
 		//Red death gradient renderer
 		this.fillGradient(matrices, 0, 0, this.width, this.height, 1615855616, -1602211792);
 		matrices.push();
@@ -85,6 +86,8 @@ public abstract class ExampleMixin extends Screen {
 
 		//Score text renderer
 		drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, 16777215);
+
+		//Button stuff
 //		if (this.message != null && mouseY > 85) {
 //			Objects.requireNonNull(this.textRenderer);
 //			if (mouseY < 85 + 9) {
