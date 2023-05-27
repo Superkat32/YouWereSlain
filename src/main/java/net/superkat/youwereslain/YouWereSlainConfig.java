@@ -25,6 +25,8 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean deathReason = false;
     @ConfigEntry public Color deathReasonColor = Color.WHITE;
     @ConfigEntry public boolean score = false;
+    @ConfigEntry public boolean showCoords = false;
+    @ConfigEntry public Color coordsColor = Color.WHITE;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -83,11 +85,32 @@ public class YouWereSlainConfig {
                     )
                     .controller(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
+            var showCoords = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.showcoords"))
+                    .tooltip(Text.translatable("youwereslain.showcoords.tooltip"))
+                    .binding(
+                            defaults.showCoords,
+                            () -> config.showCoords,
+                            val -> config.showCoords = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
+            var coordsColors = Option.createBuilder(Color.class)
+                    .name(Text.translatable("youwereslain.showcoords.color"))
+                    .binding(
+                            defaults.coordsColor,
+                            () -> config.coordsColor,
+                            val -> config.coordsColor = val
+                    )
+                    .controller(ColorController::new)
+                    .build();
             textGroup.option(deathMessage);
             textGroup.option(deathMessageColor);
             textGroup.option(deathReason);
             textGroup.option(deathReasonColor);
             textGroup.option(score);
+            textGroup.option(showCoords);
+            textGroup.option(coordsColors);
             defaultCategoryBuilder.group(textGroup.build());
 
             return builder

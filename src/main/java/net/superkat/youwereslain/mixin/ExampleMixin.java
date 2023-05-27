@@ -25,6 +25,8 @@ public class ExampleMixin extends Screen {
 	public final boolean isHardcore;
 	private Text scoreText;
 	private Text respawnText = Text.of("0");
+	private Text deathCoords;
+	private Text deathCoordsMessage;
 //	public final List<ButtonWidget> buttons = Lists.newArrayList();
 
 	public ExampleMixin(@Nullable Text message, boolean isHardcore) {
@@ -66,6 +68,10 @@ public class ExampleMixin extends Screen {
 			//Sets the score text
 			this.scoreText = Text.translatable("deathScreen.score").append(": ").append(Text.literal(Integer.toString(this.client.player.getScore())).formatted(Formatting.YELLOW));
 		}
+		if(INSTANCE.getConfig().showCoords) {
+			this.deathCoords = Text.of(this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ());
+			this.deathCoordsMessage = Text.of("Death coordinates: " + this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ());
+		}
 	}
 
 	@Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -79,6 +85,9 @@ public class ExampleMixin extends Screen {
 		//You Died! text renderer
 		int deathmessagecolor = INSTANCE.getConfig().deathMessageColor.getRGB();
 		drawCenteredText(matrices, this.textRenderer, INSTANCE.getConfig().deathMessage, this.width / 2 / 2, 30, deathmessagecolor);
+
+		//Respawn timer renderer
+		drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2 / 2, 68, 16777215);
 		matrices.pop();
 
 		//Death message text renderer
@@ -92,8 +101,12 @@ public class ExampleMixin extends Screen {
 			drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, 16777215);
 		}
 
-		//Respawn timer renderer
-		drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2, 135, 16777215);
+		if(this.deathCoords != null) {
+			int deathcoordscolor = INSTANCE.getConfig().coordsColor.getRGB();
+			drawCenteredText(matrices, this.textRenderer, this.deathCoords, this.width / 2, 112, deathcoordscolor);
+		} else {
+			LOGGER.warn("DEATH COORDS NULL");
+		}
 
 		//Button stuff
 //		if (this.message != null && mouseY > 85) {
