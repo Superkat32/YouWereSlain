@@ -8,10 +8,12 @@ import dev.isxander.yacl.config.ConfigEntry;
 import dev.isxander.yacl.config.ConfigInstance;
 import dev.isxander.yacl.config.GsonConfigInstance;
 import dev.isxander.yacl.gui.controllers.BooleanController;
+import dev.isxander.yacl.gui.controllers.ColorController;
 import dev.isxander.yacl.gui.controllers.string.StringController;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
+import java.awt.*;
 import java.nio.file.Path;
 
 public class YouWereSlainConfig {
@@ -19,8 +21,8 @@ public class YouWereSlainConfig {
     public static final ConfigInstance<YouWereSlainConfig> INSTANCE = new GsonConfigInstance<>(YouWereSlainConfig.class, Path.of("./config/youwereslain.json"));
 
     @ConfigEntry public boolean myBoolean = true;
-
     @ConfigEntry public String deathMessage = "You were slain...";
+    @ConfigEntry public Color deathMessageColor = new Color(240, 130, 132);
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -41,13 +43,16 @@ public class YouWereSlainConfig {
                 )
                 .controller(StringController::new)
                 .build();
-
-//            var deathMessage = Option.createBuilder(String.class)
-//                    .name(Text.translatable("youwereslain.deathmessage"))
-//                    .tooltip(Text.translatable("youwereslain.deathmessage.tooltip"))
-//                    .controller(StringController::new)
-//                    .build();
-//            textGroup.option(deathMessage);
+            var deathMessageColor = Option.createBuilder(Color.class)
+                    .name(Text.translatable("youwereslain.deathmessage.color"))
+                    .tooltip(Text.translatable("youwereslain.deathmessage.color.tooltip"))
+                    .binding(
+                            defaults.deathMessageColor,
+                            () -> config.deathMessageColor,
+                            val -> config.deathMessageColor = val
+                    )
+                    .controller(ColorController::new)
+                    .build();
             var myBoolean = Option.createBuilder(Boolean.class)
                 .name(Text.literal("My boolean"))
                 .tooltip(Text.literal("My boolean tooltip"))
@@ -59,6 +64,7 @@ public class YouWereSlainConfig {
                 .controller(booleanOption -> new BooleanController(booleanOption, true))
                 .build();
             textGroup.option(deathMessage);
+            textGroup.option(deathMessageColor);
             textGroup.option(myBoolean);
             defaultCategoryBuilder.group(textGroup.build());
 

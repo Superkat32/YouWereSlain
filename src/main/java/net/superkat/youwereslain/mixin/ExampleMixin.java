@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static net.superkat.youwereslain.YouWereSlainConfig.INSTANCE;
 import static net.superkat.youwereslain.YouWereSlainMain.LOGGER;
 
 @Mixin(DeathScreen.class)
@@ -73,7 +74,8 @@ public class ExampleMixin extends Screen {
 		matrices.push();
 		matrices.scale(2.0F, 2.0F, 2.0F);
 		//You Died! text renderer
-		drawCenteredText(matrices, this.textRenderer, Text.literal("You were slain..."), this.width / 2 / 2, 30, 16777215);
+		int deathmessagecolor = INSTANCE.getConfig().deathMessageColor.getRGB();
+		drawCenteredText(matrices, this.textRenderer, INSTANCE.getConfig().deathMessage, this.width / 2 / 2, 30, deathmessagecolor);
 		matrices.pop();
 		//Death message text renderer
 		if (this.message != null) {
