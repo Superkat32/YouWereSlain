@@ -5,7 +5,11 @@
 
   "youwereslain.text.group": "Text Group",
   "youwereslain.text.group.tooltip": "All config options related to text",
-  "youwereslain.deathmessage": "Death message",
-  "youwereslain.deathmessage.tooltip": "The replacement for the \"You Died!\" text"
+  "youwereslain.deathmessage": "Death Message",
+  "youwereslain.deathmessage.tooltip": "The replacement for the \"You Died!\" text",
+  "youwereslain.deathmessage.color": "Death Message Color",
+  "youwereslain.deathreason": "Death Reason",
+  "youwereslain.deathreason.tooltip": "Display the reason for the player's death",
+  "youwereslain.deathreason.color": "Death Reason Color"
 }
 

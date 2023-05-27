@@ -20,9 +20,10 @@ public class YouWereSlainConfig {
 
     public static final ConfigInstance<YouWereSlainConfig> INSTANCE = new GsonConfigInstance<>(YouWereSlainConfig.class, Path.of("./config/youwereslain.json"));
 
-    @ConfigEntry public boolean myBoolean = true;
     @ConfigEntry public String deathMessage = "You were slain...";
     @ConfigEntry public Color deathMessageColor = new Color(240, 130, 132);
+    @ConfigEntry public boolean deathReason = false;
+    @ConfigEntry public Color deathReasonColor = Color.WHITE;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -45,7 +46,6 @@ public class YouWereSlainConfig {
                 .build();
             var deathMessageColor = Option.createBuilder(Color.class)
                     .name(Text.translatable("youwereslain.deathmessage.color"))
-                    .tooltip(Text.translatable("youwereslain.deathmessage.color.tooltip"))
                     .binding(
                             defaults.deathMessageColor,
                             () -> config.deathMessageColor,
@@ -53,19 +53,29 @@ public class YouWereSlainConfig {
                     )
                     .controller(ColorController::new)
                     .build();
-            var myBoolean = Option.createBuilder(Boolean.class)
-                .name(Text.literal("My boolean"))
-                .tooltip(Text.literal("My boolean tooltip"))
-                .binding(
-                        defaults.myBoolean,
-                        () -> config.myBoolean,
-                        val -> config.myBoolean = val
-                )
-                .controller(booleanOption -> new BooleanController(booleanOption, true))
-                .build();
+            var deathReason = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.deathreason"))
+                    .tooltip(Text.translatable("youwereslain.deathreason.tooltip"))
+                    .binding(
+                            defaults.deathReason,
+                            () -> config.deathReason,
+                            val -> config.deathReason = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
+            var deathReasonColor = Option.createBuilder(Color.class)
+                    .name(Text.translatable("youwereslain.deathreason.color"))
+                    .binding(
+                            defaults.deathReasonColor,
+                            () -> config.deathReasonColor,
+                            val -> config.deathReasonColor = val
+                    )
+                    .controller(ColorController::new)
+                    .build();
             textGroup.option(deathMessage);
             textGroup.option(deathMessageColor);
-            textGroup.option(myBoolean);
+            textGroup.option(deathReason);
+            textGroup.option(deathReasonColor);
             defaultCategoryBuilder.group(textGroup.build());
 
             return builder

@@ -23,6 +23,7 @@ public class ExampleMixin extends Screen {
 	private Text message; //The player's death message
 	public final boolean isHardcore;
 	private Text scoreText;
+    public float opacity = INSTANCE.getConfig().deathReason ? 0.01F : 1.0F;
 //	public final List<ButtonWidget> buttons = Lists.newArrayList();
 
 	public ExampleMixin(@Nullable Text message, boolean isHardcore) {
@@ -73,13 +74,16 @@ public class ExampleMixin extends Screen {
 		this.fillGradient(matrices, 0, 0, this.width, this.height, 1615855616, -1602211792);
 		matrices.push();
 		matrices.scale(2.0F, 2.0F, 2.0F);
+
 		//You Died! text renderer
 		int deathmessagecolor = INSTANCE.getConfig().deathMessageColor.getRGB();
 		drawCenteredText(matrices, this.textRenderer, INSTANCE.getConfig().deathMessage, this.width / 2 / 2, 30, deathmessagecolor);
 		matrices.pop();
+
 		//Death message text renderer
-		if (this.message != null) {
-			drawCenteredText(matrices, this.textRenderer, this.message, this.width / 2, 85, 16777215);
+		if (this.message != null && INSTANCE.getConfig().deathReason) {
+            int deathreasoncolor = INSTANCE.getConfig().deathReasonColor.getRGB();
+			drawCenteredText(matrices, this.textRenderer, this.message, this.width / 2, 85, deathreasoncolor);
 		}
 
 		//Score text renderer
