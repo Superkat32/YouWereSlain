@@ -9,6 +9,7 @@ public class YouWereSlainClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        YouWereSlainConfig.INSTANCE.load();
         YouWereSlainMain.LOGGER.info("yay");
     }
 }

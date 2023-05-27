@@ -1,9 +1,7 @@
 package net.superkat.youwereslain.mixin;
 
-import com.google.common.collect.Lists;
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
@@ -12,12 +10,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
-
 import static net.superkat.youwereslain.YouWereSlainMain.LOGGER;
 
 @Mixin(DeathScreen.class)
-public abstract class ExampleMixin extends Screen {
+public class ExampleMixin extends Screen {
 
 //	@Shadow @Nullable protected abstract Style getTextComponentUnderMouse(int mouseX);
 
@@ -26,7 +22,7 @@ public abstract class ExampleMixin extends Screen {
 	private Text message; //The player's death message
 	public final boolean isHardcore;
 	private Text scoreText;
-	public final List<ButtonWidget> buttons = Lists.newArrayList();
+//	public final List<ButtonWidget> buttons = Lists.newArrayList();
 
 	public ExampleMixin(@Nullable Text message, boolean isHardcore) {
 		super(Text.of(""));
@@ -35,12 +31,12 @@ public abstract class ExampleMixin extends Screen {
 	}
 
 	@Inject(method = "init", at = @At("RETURN"))
-	public void init(CallbackInfo callbackInfo) {
+	private void init(CallbackInfo callbackInfo) {
 		LOGGER.info("You died...");
 		ticksSinceDeath = 0;
-		this.buttons.clear();
+//		this.buttons.clear();
 		//I don't think this does anything
-		this.buttons.removeAll(buttons);
+//		this.buttons.removeAll(buttons);
 		//Respawn or spectate button
 //		this.buttons.add((ButtonWidget) this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, isHardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), (button) -> {
 //			this.client.player.requestRespawn();
@@ -70,7 +66,7 @@ public abstract class ExampleMixin extends Screen {
 	}
 
 	@Inject(method = "render", at = @At("HEAD"), cancellable = true)
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+	private void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		ci.cancel(); //Done to prevent the default death screen from rendering
 		//Red death gradient renderer
 		this.fillGradient(matrices, 0, 0, this.width, this.height, 1615855616, -1602211792);
@@ -100,11 +96,11 @@ public abstract class ExampleMixin extends Screen {
 	}
 
 	@Inject(method = "tick", at = @At("RETURN"))
-	public void tick(CallbackInfo ci) {
+	private void tick(CallbackInfo ci) {
 		super.tick();
 		++this.ticksSinceDeath;
 		ticksSinceDeathString = String.valueOf(ticksSinceDeath);
-		ButtonWidget buttonWidget;
+//		ButtonWidget buttonWidget;
 		this.scoreText = Text.of(ticksSinceDeathString);
 		if (this.ticksSinceDeath == 100) {
 //			for(Iterator var1 = this.buttons.iterator(); var1.hasNext(); buttonWidget.active = true) {
