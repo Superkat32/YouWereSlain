@@ -4,6 +4,7 @@ import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,7 +24,7 @@ public class ExampleMixin extends Screen {
 	private Text message; //The player's death message
 	public final boolean isHardcore;
 	private Text scoreText;
-    public float opacity = INSTANCE.getConfig().deathReason ? 0.01F : 1.0F;
+	private Text respawnText = Text.of("0");
 //	public final List<ButtonWidget> buttons = Lists.newArrayList();
 
 	public ExampleMixin(@Nullable Text message, boolean isHardcore) {
@@ -61,10 +62,10 @@ public class ExampleMixin extends Screen {
 //			buttonWidget = (ButtonWidget)var1.next();
 //		}
 
-		//Sets the score text
-//		this.scoreText = Text.translatable("deathScreen.score").append(": ").append(Text.literal(Integer.toString(this.client.player.getScore())).formatted(Formatting.YELLOW));
-		//Deletes the score text
-//		this.scoreText = Text.literal("");
+		if(INSTANCE.getConfig().score) {
+			//Sets the score text
+			this.scoreText = Text.translatable("deathScreen.score").append(": ").append(Text.literal(Integer.toString(this.client.player.getScore())).formatted(Formatting.YELLOW));
+		}
 	}
 
 	@Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -87,7 +88,12 @@ public class ExampleMixin extends Screen {
 		}
 
 		//Score text renderer
-		drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, 16777215);
+		if(this.scoreText != null && INSTANCE.getConfig().score) {
+			drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, 16777215);
+		}
+
+		//Respawn timer renderer
+		drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2, 135, 16777215);
 
 		//Button stuff
 //		if (this.message != null && mouseY > 85) {
@@ -107,7 +113,7 @@ public class ExampleMixin extends Screen {
 		++this.ticksSinceDeath;
 		ticksSinceDeathString = String.valueOf(ticksSinceDeath);
 //		ButtonWidget buttonWidget;
-		this.scoreText = Text.of(ticksSinceDeathString);
+		this.respawnText = Text.of(ticksSinceDeathString);
 		if (this.ticksSinceDeath == 100) {
 //			for(Iterator var1 = this.buttons.iterator(); var1.hasNext(); buttonWidget.active = true) {
 //				buttonWidget = (ButtonWidget)var1.next();

@@ -10,6 +10,8 @@
   "youwereslain.deathmessage.color": "Death Message Color",
   "youwereslain.deathreason": "Death Reason",
   "youwereslain.deathreason.tooltip": "Display the reason for the player's death",
-  "youwereslain.deathreason.color": "Death Reason Color"
+  "youwereslain.deathreason.color": "Death Reason Color",
+  "youwereslain.score": "Score",
+  "youwereslain.score.tooltip": "Display the player's score upon death"
 }
 

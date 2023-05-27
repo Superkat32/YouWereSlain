@@ -24,6 +24,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public Color deathMessageColor = new Color(240, 130, 132);
     @ConfigEntry public boolean deathReason = false;
     @ConfigEntry public Color deathReasonColor = Color.WHITE;
+    @ConfigEntry public boolean score = false;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -72,10 +73,21 @@ public class YouWereSlainConfig {
                     )
                     .controller(ColorController::new)
                     .build();
+            var score = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.score"))
+                    .tooltip(Text.translatable("youwereslain.score.tooltip"))
+                    .binding(
+                            defaults.score,
+                            () -> config.score,
+                            val -> config.score = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             textGroup.option(deathMessage);
             textGroup.option(deathMessageColor);
             textGroup.option(deathReason);
             textGroup.option(deathReasonColor);
+            textGroup.option(score);
             defaultCategoryBuilder.group(textGroup.build());
 
             return builder
