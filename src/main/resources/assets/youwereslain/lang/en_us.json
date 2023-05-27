@@ -1,0 +1,11 @@
+{
+  "youwereslain.title": "You Were Slain Config",
+
+  "youwereslain.category.default": "Death Screen Category",
+
+  "youwereslain.text.group": "Text Group",
+  "youwereslain.text.group.tooltip": "All config options related to text",
+  "youwereslain.deathmessage": "Death message",
+  "youwereslain.deathmessage.tooltip": "The replacement for the \"You Died!\" text"
+}
+
