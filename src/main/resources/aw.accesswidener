@@ -1,7 +1,4 @@
 accessWidener v2 named
-accessible field net/minecraft/client/MinecraftClient currentScreen Lnet/minecraft/client/gui/screen/Screen;
-accessible field net/minecraft/client/MinecraftClient player Lnet/minecraft/client/network/ClientPlayerEntity;
+
 accessible field net/minecraft/client/gui/screen/DeathScreen ticksSinceDeath I
-accessible field net/minecraft/client/gui/screen/DeathScreen isHardcore Z
-accessible field net/minecraft/client/gui/screen/DeathScreen buttons Ljava/util/List;
 

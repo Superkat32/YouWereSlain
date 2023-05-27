@@ -8,6 +8,7 @@ import dev.isxander.yacl.config.ConfigEntry;
 import dev.isxander.yacl.config.ConfigInstance;
 import dev.isxander.yacl.config.GsonConfigInstance;
 import dev.isxander.yacl.gui.controllers.BooleanController;
+import dev.isxander.yacl.gui.controllers.string.StringController;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
@@ -19,7 +20,7 @@ public class YouWereSlainConfig {
 
     @ConfigEntry public boolean myBoolean = true;
 
-//    @ConfigEntry public String deathMessage;
+    @ConfigEntry public String deathMessage = "You were slain...";
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -29,6 +30,17 @@ public class YouWereSlainConfig {
             var textGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("youwereslain.text.group"))
                     .tooltip(Text.translatable("youwereslain.text.group.tooltip"));
+
+            var deathMessage = Option.createBuilder(String.class)
+                .name(Text.translatable("youwereslain.deathmessage"))
+                .tooltip(Text.translatable("youwereslain.deathmessage.tooltip"))
+                .binding(
+                    defaults.deathMessage,
+                    () -> config.deathMessage,
+                    val -> config.deathMessage = val
+                )
+                .controller(StringController::new)
+                .build();
 
 //            var deathMessage = Option.createBuilder(String.class)
 //                    .name(Text.translatable("youwereslain.deathmessage"))
@@ -46,6 +58,7 @@ public class YouWereSlainConfig {
                 )
                 .controller(booleanOption -> new BooleanController(booleanOption, true))
                 .build();
+            textGroup.option(deathMessage);
             textGroup.option(myBoolean);
             defaultCategoryBuilder.group(textGroup.build());
 
