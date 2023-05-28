@@ -9,6 +9,7 @@ import dev.isxander.yacl.config.ConfigInstance;
 import dev.isxander.yacl.config.GsonConfigInstance;
 import dev.isxander.yacl.gui.controllers.BooleanController;
 import dev.isxander.yacl.gui.controllers.ColorController;
+import dev.isxander.yacl.gui.controllers.slider.IntegerSliderController;
 import dev.isxander.yacl.gui.controllers.string.StringController;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -30,6 +31,8 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean showCoords = false;
     @ConfigEntry public Color coordsColor = Color.WHITE;
     @ConfigEntry public boolean sendCoordsInChat = false;
+    @ConfigEntry public boolean respawnTimer = true;
+    @ConfigEntry public int respawnDelay = 15;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -41,15 +44,15 @@ public class YouWereSlainConfig {
                     .tooltip(Text.translatable("youwereslain.text.group.tooltip"));
 
             var deathMessage = Option.createBuilder(String.class)
-                .name(Text.translatable("youwereslain.deathmessage"))
-                .tooltip(Text.translatable("youwereslain.deathmessage.tooltip"))
-                .binding(
-                    defaults.deathMessage,
-                    () -> config.deathMessage,
-                    val -> config.deathMessage = val
-                )
-                .controller(StringController::new)
-                .build();
+                    .name(Text.translatable("youwereslain.deathmessage"))
+                    .tooltip(Text.translatable("youwereslain.deathmessage.tooltip"))
+                    .binding(
+                        defaults.deathMessage,
+                        () -> config.deathMessage,
+                        val -> config.deathMessage = val
+                    )
+                    .controller(StringController::new)
+                    .build();
             var deathMessageColor = Option.createBuilder(Color.class)
                     .name(Text.translatable("youwereslain.deathmessage.color"))
                     .binding(
@@ -155,9 +158,37 @@ public class YouWereSlainConfig {
             coordGroup.option(showCoords);
             coordGroup.option(coordsColors);
             coordGroup.option(sendCoordsInChat);
+
+            var respawnGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("youwereslain.respawn.group"))
+                    .tooltip(Text.translatable("youwereslain.respawn.group.tooltip"));
+            var respawnDelayText = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.timer"))
+                    .tooltip(Text.translatable("youwereslain.timer.tooltip"))
+                    .binding(
+                            defaults.respawnTimer,
+                            () -> config.respawnTimer,
+                            val -> config.respawnTimer = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
+            var respawnDelay = Option.createBuilder(Integer.class)
+                    .name(Text.translatable("youwereslain.delay"))
+                    .tooltip(Text.translatable("youwereslain.delay.tooltip"))
+                    .binding(
+                            defaults.respawnDelay,
+                            () -> config.respawnDelay,
+                            val -> config.respawnDelay = val
+                    )
+                    .controller(opt -> new <Integer>IntegerSliderController(opt, 1, 100, 1))
+                    .build();
+            respawnGroup.option(respawnDelayText);
+            respawnGroup.option(respawnDelay);
+
             defaultCategoryBuilder.group(textGroup.build());
             defaultCategoryBuilder.group(buttonsGroup.build());
             defaultCategoryBuilder.group(coordGroup.build());
+            defaultCategoryBuilder.group(respawnGroup.build());
             return builder
                     .title(Text.translatable("youwereslain.title"))
                     .category(defaultCategoryBuilder.build());

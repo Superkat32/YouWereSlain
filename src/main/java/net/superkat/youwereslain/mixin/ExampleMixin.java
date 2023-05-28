@@ -26,6 +26,11 @@ public class ExampleMixin extends Screen {
 
 	public int ticksSinceDeath;
 	String ticksSinceDeathString;
+	public int ticksUntilRespawn;
+	public int secondsUntilRespawn;
+	public int respawnDelayTicks = INSTANCE.getConfig().respawnDelay * 20;
+	public int ticksToSeconds;
+
 	private Text message; //The player's death message
 	public final boolean isHardcore;
 	private Text scoreText;
@@ -44,6 +49,9 @@ public class ExampleMixin extends Screen {
 	private void init(CallbackInfo callbackInfo) {
 		LOGGER.info("You died...");
 		ticksSinceDeath = 0;
+		ticksUntilRespawn = respawnDelayTicks;
+		secondsUntilRespawn = respawnDelayTicks / 20;
+		ticksToSeconds = 0;
 		this.buttons.clear();
 		if(!INSTANCE.getConfig().respawnButton && !INSTANCE.getConfig().titleScreenButton) {
 			LOGGER.info("No buttons!");
@@ -117,13 +125,13 @@ public class ExampleMixin extends Screen {
 		drawCenteredText(matrices, this.textRenderer, INSTANCE.getConfig().deathMessage, this.width / 2 / 2, 30, deathmessagecolor);
 
 		//Respawn timer renderer
-		if(!INSTANCE.getConfig().respawnButton) {
+		if(!INSTANCE.getConfig().respawnButton && INSTANCE.getConfig().respawnTimer) {
 			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2 / 2, 68, 16777215);
 		}
 		matrices.pop();
 
 		//Respawn timer renderer
-		if(INSTANCE.getConfig().respawnButton) {
+		if(INSTANCE.getConfig().respawnButton && INSTANCE.getConfig().respawnTimer) {
 			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2, 123, 16777215);
 		}
 
@@ -141,6 +149,7 @@ public class ExampleMixin extends Screen {
 		if(this.deathCoords != null && INSTANCE.getConfig().showCoords) {
 			int deathcoordscolor = INSTANCE.getConfig().coordsColor.getRGB();
 			drawCenteredText(matrices, this.textRenderer, this.deathCoords, this.width / 2, 112, deathcoordscolor);
+			//TODO fix issue where log says player pos is null because showcoords is disabled
 		} else {
 			if(ticksSinceDeath == 3) {
 				LOGGER.warn("DEATH COORDS NULL");
@@ -179,13 +188,18 @@ public class ExampleMixin extends Screen {
 	@Inject(method = "tick", at = @At("RETURN"))
 	private void tick(CallbackInfo ci) {
 		super.tick();
-//		++this.ticksSinceDeath;
-		ticksSinceDeathString = String.valueOf(ticksSinceDeath);
+		++this.ticksToSeconds;
+		--this.ticksUntilRespawn;
+		ticksSinceDeathString = String.valueOf(secondsUntilRespawn);
 		this.respawnText = Text.of(ticksSinceDeathString);
 		if(ticksSinceDeath == 3 && INSTANCE.getConfig().sendCoordsInChat) {
 			this.client.inGameHud.getChatHud().addMessage(deathCoordsMessage);
 		}
-		if (this.ticksSinceDeath == 100) {
+		if(ticksToSeconds == 20) {
+			--secondsUntilRespawn;
+			ticksToSeconds = 0;
+		}
+		if (this.ticksUntilRespawn == 0) {
 			for (ButtonWidget buttonWidget : this.buttons) {
 				buttonWidget.active = true;
 			}
