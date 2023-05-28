@@ -177,6 +177,7 @@ public class YouWereSlainConfig {
             var respawnDelayText = Option.createBuilder(Boolean.class)
                     .name(Text.translatable("youwereslain.timer"))
                     .tooltip(Text.translatable("youwereslain.timer.tooltip"))
+                    .tooltip(Text.translatable("youwereslain.timer.tooltip.note"))
                     .binding(
                             defaults.respawnTimer,
                             () -> config.respawnTimer,
@@ -197,6 +198,7 @@ public class YouWereSlainConfig {
             var respawningMessage = Option.createBuilder(String.class)
                     .name(Text.translatable("youwereslain.respawnmessage"))
                     .tooltip(Text.translatable("youwereslain.respawnmessage.tooltip"))
+                    .tooltip(Text.translatable("youwereslain.respawnmessage.tooltip.time"))
                     .binding(
                             defaults.respawningMessage,
                             () -> config.respawningMessage,

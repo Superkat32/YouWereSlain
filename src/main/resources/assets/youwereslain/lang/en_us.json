@@ -13,6 +13,7 @@
   "youwereslain.deathreason.color": "Death Reason Color",
   "youwereslain.score": "Score",
   "youwereslain.score.tooltip": "Display the player's score upon death",
+  "youwereslain.score.color": "Score Color",
 
   "youwereslain.buttons.group": "Buttons",
   "youwereslain.buttons.group.tooltip": "All config options related to buttons",
@@ -27,6 +28,17 @@
   "youwereslain.showcoords.tooltip": "Show your death coordinates on the death screen",
   "youwereslain.showcoords.color": "Death Coordinates Color",
   "youwereslain.chatcoords": "Chat Death Coordinates(You Only)",
-  "youwereslain.chatcoords.tooltip": "Send a chat message containing your death coordinates that only you can see"
+  "youwereslain.chatcoords.tooltip": "Send a chat message containing your death coordinates that only you can see",
+
+  "youwereslain.respawn.group": "Respawning",
+  "youwereslain.respawn.group.tooltip": "All config options related to respawning",
+  "youwereslain.timer": "Respawn Delay Text",
+  "youwereslain.timer.tooltip": "Show the time you have left until you respawn on the death screen",
+  "youwereslain.timer.tooltip.note": "§l§6Note:§r You will still automatically respawn after the delay is over even if this option is disabled, unless the mod is turned off",
+  "youwereslain.delay": "Respawn Delay",
+  "youwereslain.delay.tooltip": "The delay(in seconds) until you respawn after death",
+  "youwereslain.respawnmessage": "Respawning Message",
+  "youwereslain.respawnmessage.tooltip": "The message telling you how long you have until you respawn",
+  "youwereslain.respawnmessage.tooltip.time": "<time> is the seconds left until you respawn"
 }
 
