@@ -25,7 +25,7 @@ public class ExampleMixin extends Screen {
 //	@Shadow @Nullable protected abstract Style getTextComponentUnderMouse(int mouseX);
 
 	public int ticksSinceDeath;
-	String ticksSinceDeathString;
+	String respawnMessage;
 	public int ticksUntilRespawn;
 	public int secondsUntilRespawn;
 	public int respawnDelayTicks = INSTANCE.getConfig().respawnDelay * 20;
@@ -190,8 +190,8 @@ public class ExampleMixin extends Screen {
 		super.tick();
 		++this.ticksToSeconds;
 		--this.ticksUntilRespawn;
-		ticksSinceDeathString = String.valueOf(secondsUntilRespawn);
-		this.respawnText = Text.of(ticksSinceDeathString);
+		respawnMessage = INSTANCE.getConfig().respawningMessage;
+		this.respawnText = Text.of(respawnMessage.replaceAll("<time>", String.valueOf(secondsUntilRespawn)));
 		if(ticksSinceDeath == 3 && INSTANCE.getConfig().sendCoordsInChat) {
 			this.client.inGameHud.getChatHud().addMessage(deathCoordsMessage);
 		}

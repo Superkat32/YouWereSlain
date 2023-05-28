@@ -33,6 +33,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean sendCoordsInChat = false;
     @ConfigEntry public boolean respawnTimer = true;
     @ConfigEntry public int respawnDelay = 15;
+    @ConfigEntry public String respawningMessage = "Respawning in <time>";
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -182,8 +183,19 @@ public class YouWereSlainConfig {
                     )
                     .controller(opt -> new <Integer>IntegerSliderController(opt, 1, 100, 1))
                     .build();
+            var respawningMessage = Option.createBuilder(String.class)
+                    .name(Text.translatable("youwereslain.respawnmessage"))
+                    .tooltip(Text.translatable("youwereslain.respawnmessage.tooltip"))
+                    .binding(
+                            defaults.respawningMessage,
+                            () -> config.respawningMessage,
+                            val -> config.respawningMessage = val
+                    )
+                    .controller(StringController::new)
+                    .build();
             respawnGroup.option(respawnDelayText);
             respawnGroup.option(respawnDelay);
+            respawnGroup.option(respawningMessage);
 
             defaultCategoryBuilder.group(textGroup.build());
             defaultCategoryBuilder.group(buttonsGroup.build());
