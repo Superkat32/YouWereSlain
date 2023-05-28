@@ -27,6 +27,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean score = false;
     @ConfigEntry public boolean showCoords = false;
     @ConfigEntry public Color coordsColor = Color.WHITE;
+    @ConfigEntry public boolean sendCoordsInChat = false;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -104,6 +105,16 @@ public class YouWereSlainConfig {
                     )
                     .controller(ColorController::new)
                     .build();
+            var sendCoordsInChat = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.chatcoords"))
+                    .tooltip(Text.translatable("youwereslain.chatcoords.tooltip"))
+                    .binding(
+                            defaults.sendCoordsInChat,
+                            () -> config.sendCoordsInChat,
+                            val -> config.sendCoordsInChat = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             textGroup.option(deathMessage);
             textGroup.option(deathMessageColor);
             textGroup.option(deathReason);
@@ -111,6 +122,7 @@ public class YouWereSlainConfig {
             textGroup.option(score);
             textGroup.option(showCoords);
             textGroup.option(coordsColors);
+            textGroup.option(sendCoordsInChat);
             defaultCategoryBuilder.group(textGroup.build());
 
             return builder

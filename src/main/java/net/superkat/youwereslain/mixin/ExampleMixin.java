@@ -2,14 +2,18 @@ package net.superkat.youwereslain.mixin;
 
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.List;
 
 import static net.superkat.youwereslain.YouWereSlainConfig.INSTANCE;
 import static net.superkat.youwereslain.YouWereSlainMain.LOGGER;
@@ -27,7 +31,7 @@ public class ExampleMixin extends Screen {
 	private Text respawnText = Text.of("0");
 	private Text deathCoords;
 	private Text deathCoordsMessage;
-//	public final List<ButtonWidget> buttons = Lists.newArrayList();
+	public final List<ButtonWidget> buttons = Lists.newArrayList();
 
 	public ExampleMixin(@Nullable Text message, boolean isHardcore) {
 		super(Text.of(""));
@@ -39,7 +43,7 @@ public class ExampleMixin extends Screen {
 	private void init(CallbackInfo callbackInfo) {
 		LOGGER.info("You died...");
 		ticksSinceDeath = 0;
-//		this.buttons.clear();
+		this.buttons.clear();
 		//I don't think this does anything
 //		this.buttons.removeAll(buttons);
 		//Respawn or spectate button
@@ -68,10 +72,8 @@ public class ExampleMixin extends Screen {
 			//Sets the score text
 			this.scoreText = Text.translatable("deathScreen.score").append(": ").append(Text.literal(Integer.toString(this.client.player.getScore())).formatted(Formatting.YELLOW));
 		}
-		if(INSTANCE.getConfig().showCoords) {
-			this.deathCoords = Text.of(this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ());
-			this.deathCoordsMessage = Text.of("Death coordinates: " + this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ());
-		}
+		this.deathCoords = Text.of(this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ());
+		this.deathCoordsMessage = Text.of("Death coordinates: " + this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ());
 	}
 
 	@Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -101,7 +103,7 @@ public class ExampleMixin extends Screen {
 			drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, 16777215);
 		}
 
-		if(this.deathCoords != null) {
+		if(this.deathCoords != null && INSTANCE.getConfig().showCoords) {
 			int deathcoordscolor = INSTANCE.getConfig().coordsColor.getRGB();
 			drawCenteredText(matrices, this.textRenderer, this.deathCoords, this.width / 2, 112, deathcoordscolor);
 		} else {
@@ -123,10 +125,13 @@ public class ExampleMixin extends Screen {
 	@Inject(method = "tick", at = @At("RETURN"))
 	private void tick(CallbackInfo ci) {
 		super.tick();
-		++this.ticksSinceDeath;
+//		++this.ticksSinceDeath;
 		ticksSinceDeathString = String.valueOf(ticksSinceDeath);
 //		ButtonWidget buttonWidget;
 		this.respawnText = Text.of(ticksSinceDeathString);
+		if(ticksSinceDeath == 3 && INSTANCE.getConfig().sendCoordsInChat) {
+			this.client.inGameHud.getChatHud().addMessage(deathCoordsMessage);
+		}
 		if (this.ticksSinceDeath == 100) {
 //			for(Iterator var1 = this.buttons.iterator(); var1.hasNext(); buttonWidget.active = true) {
 //				buttonWidget = (ButtonWidget)var1.next();
