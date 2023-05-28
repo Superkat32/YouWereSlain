@@ -14,6 +14,13 @@
   "youwereslain.score": "Score",
   "youwereslain.score.tooltip": "Display the player's score upon death",
 
+  "youwereslain.buttons.group": "Buttons",
+  "youwereslain.buttons.group.tooltip": "All config options related to buttons",
+  "youwereslain.button.respawn": "Show Respawn Button",
+  "youwereslain.button.respawn.tooltip": "Show the respawn button",
+  "youwereslain.button.title": "Show Title Screen Button",
+  "youwereslain.button.title.tooltip": "Show the title screen button",
+
   "youwereslain.coord.group": "Coordinates",
   "youwereslain.coord.group.tooltip": "All config options related to coordinates",
   "youwereslain.showcoords": "Show Death Coordinates",
