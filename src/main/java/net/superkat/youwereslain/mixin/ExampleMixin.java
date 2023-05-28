@@ -143,7 +143,8 @@ public class ExampleMixin extends Screen {
 
 		//Score text renderer
 		if(this.scoreText != null && INSTANCE.getConfig().score) {
-			drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, 16777215);
+			int scorecolor = INSTANCE.getConfig().scoreColor.getRGB();
+			drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, scorecolor);
 		}
 
 		if(this.deathCoords != null && INSTANCE.getConfig().showCoords) {

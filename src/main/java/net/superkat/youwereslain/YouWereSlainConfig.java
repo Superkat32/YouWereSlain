@@ -26,6 +26,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean deathReason = false;
     @ConfigEntry public Color deathReasonColor = Color.WHITE;
     @ConfigEntry public boolean score = false;
+    @ConfigEntry public Color scoreColor = new Color(101, 255, 95);
     @ConfigEntry public boolean respawnButton = false;
     @ConfigEntry public boolean titleScreenButton = false;
     @ConfigEntry public boolean showCoords = false;
@@ -92,11 +93,21 @@ public class YouWereSlainConfig {
                     )
                     .controller(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
+            var scoreColor = Option.createBuilder(Color.class)
+                    .name(Text.translatable("youwereslain.score.color"))
+                    .binding(
+                            defaults.scoreColor,
+                            () -> config.scoreColor,
+                            val -> config.scoreColor = val
+                    )
+                    .controller(ColorController::new)
+                    .build();
             textGroup.option(deathMessage);
             textGroup.option(deathMessageColor);
             textGroup.option(deathReason);
             textGroup.option(deathReasonColor);
             textGroup.option(score);
+            textGroup.option(scoreColor);
 
             var buttonsGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("youwereslain.buttons.group"))
