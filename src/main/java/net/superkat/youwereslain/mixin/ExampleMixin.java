@@ -1,12 +1,13 @@
 package net.superkat.youwereslain.mixin;
 
-import net.minecraft.client.gui.screen.DeathScreen;
-import net.minecraft.client.gui.screen.Screen;
+import com.google.common.collect.Lists;
+import net.minecraft.client.gui.screen.*;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.screen.ScreenTexts;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,7 +32,7 @@ public class ExampleMixin extends Screen {
 	private Text respawnText = Text.of("0");
 	private Text deathCoords;
 	private Text deathCoordsMessage;
-	public final List<ButtonWidget> buttons = Lists.newArrayList();
+	private final List<ButtonWidget> buttons = Lists.newArrayList();
 
 	public ExampleMixin(@Nullable Text message, boolean isHardcore) {
 		super(Text.of(""));
@@ -44,29 +45,34 @@ public class ExampleMixin extends Screen {
 		LOGGER.info("You died...");
 		ticksSinceDeath = 0;
 		this.buttons.clear();
-		//I don't think this does anything
-//		this.buttons.removeAll(buttons);
-		//Respawn or spectate button
-//		this.buttons.add((ButtonWidget) this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, isHardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), (button) -> {
-//			this.client.player.requestRespawn();
-//			this.client.setScreen((Screen)null);
-//		})));
+		if(!INSTANCE.getConfig().respawnButton && !INSTANCE.getConfig().titleScreenButton) {
+			LOGGER.info("No buttons!");
+		} else {
+			//Respawn or spectate button
+			if(INSTANCE.getConfig().respawnButton) {
+				this.buttons.add(this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, this.isHardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), button -> {
+					this.client.player.requestRespawn();
+					this.client.setScreen(null);
+				})));
+			}
 
-		//Exit game button
-//        this.buttons.add((ButtonWidget)this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 96, 200, 20, Text.translatable("deathScreen.titleScreen"), (button) -> {
-//            if (this.isHardcore) {
-//                this.quitLevel();
-//            } else {
-//                ConfirmScreen confirmScreen = new ConfirmScreen(this::onConfirmQuit, Text.translatable("deathScreen.quit.confirm"), ScreenTexts.EMPTY, Text.translatable("deathScreen.titleScreen"), Text.translatable("deathScreen.respawn"));
-//                this.client.setScreen(confirmScreen);
-//                confirmScreen.disableButtons(20);
-//            }
-//        })));
+			//Exit game button
+			if(INSTANCE.getConfig().titleScreenButton) {
+				this.buttons.add(this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 96, 200, 20, Text.translatable("deathScreen.titleScreen"), button -> {
+					if (this.isHardcore) {
+						this.quitLevel();
+						return;
+					}
+					ConfirmScreen confirmScreen = new ConfirmScreen(this::onConfirmQuit, Text.translatable("deathScreen.quit.confirm"), ScreenTexts.EMPTY, Text.translatable("deathScreen.titleScreen"), Text.translatable("deathScreen.respawn"));
+					this.client.setScreen(confirmScreen);
+					confirmScreen.disableButtons(20);
+				})));
+			}
 
-//		ButtonWidget buttonWidget;
-//		for(Iterator var1 = this.buttons.iterator(); var1.hasNext(); buttonWidget.active = false) {
-//			buttonWidget = (ButtonWidget)var1.next();
-//		}
+			for (ButtonWidget buttonWidget : this.buttons) {
+				buttonWidget.active = false;
+			}
+		}
 
 		if(INSTANCE.getConfig().score) {
 			//Sets the score text
@@ -74,6 +80,28 @@ public class ExampleMixin extends Screen {
 		}
 		this.deathCoords = Text.of(this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ());
 		this.deathCoordsMessage = Text.of("Death coordinates: " + this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ());
+	}
+
+	@Override
+	public boolean shouldCloseOnEsc() {
+		return false;
+	}
+
+	private void onConfirmQuit(boolean quit) {
+		if (quit) {
+			this.quitLevel();
+		} else {
+			this.client.player.requestRespawn();
+			this.client.setScreen(null);
+		}
+	}
+
+	private void quitLevel() {
+		if (this.client.world != null) {
+			this.client.world.disconnect();
+		}
+		this.client.disconnect(new MessageScreen(Text.translatable("menu.savingLevel")));
+		this.client.setScreen(new TitleScreen());
 	}
 
 	@Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -113,15 +141,32 @@ public class ExampleMixin extends Screen {
 		}
 
 		//Button stuff
-//		if (this.message != null && mouseY > 85) {
-//			Objects.requireNonNull(this.textRenderer);
-//			if (mouseY < 85 + 9) {
-//				Style style = this.getTextComponentUnderMouse(mouseX);
-//				this.renderTextHoverEffect(matrices, style, mouseX, mouseY);
-//			}
-//		}
+		if(INSTANCE.getConfig().respawnButton || INSTANCE.getConfig().titleScreenButton) {
+			if (this.message != null && mouseY > 85 && mouseY < 85 + this.textRenderer.fontHeight) {
+				Style style = this.getTextComponentUnderMouse(mouseX);
+				this.renderTextHoverEffect(matrices, style, mouseX, mouseY);
+			}
+
+			for (ButtonWidget buttonWidget : this.buttons) {
+				buttonWidget.render(matrices, mouseX, mouseY, delta);
+			}
+		}
 
 //		super.render(matrices, mouseX, mouseY, delta);
+	}
+
+	@Nullable
+	private Style getTextComponentUnderMouse(int mouseX) {
+		if (this.message == null) {
+			return null;
+		}
+		int i = this.client.textRenderer.getWidth(this.message);
+		int j = this.width / 2 - i / 2;
+		int k = this.width / 2 + i / 2;
+		if (mouseX < j || mouseX > k) {
+			return null;
+		}
+		return this.client.textRenderer.getTextHandler().getStyleAt(this.message, mouseX - j);
 	}
 
 	@Inject(method = "tick", at = @At("RETURN"))
@@ -129,15 +174,14 @@ public class ExampleMixin extends Screen {
 		super.tick();
 //		++this.ticksSinceDeath;
 		ticksSinceDeathString = String.valueOf(ticksSinceDeath);
-//		ButtonWidget buttonWidget;
 		this.respawnText = Text.of(ticksSinceDeathString);
 		if(ticksSinceDeath == 3 && INSTANCE.getConfig().sendCoordsInChat) {
 			this.client.inGameHud.getChatHud().addMessage(deathCoordsMessage);
 		}
 		if (this.ticksSinceDeath == 100) {
-//			for(Iterator var1 = this.buttons.iterator(); var1.hasNext(); buttonWidget.active = true) {
-//				buttonWidget = (ButtonWidget)var1.next();
-//			}
+			for (ButtonWidget buttonWidget : this.buttons) {
+				buttonWidget.active = true;
+			}
 			this.client.player.requestRespawn();
 		}
 	}

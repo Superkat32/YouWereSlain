@@ -25,6 +25,8 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean deathReason = false;
     @ConfigEntry public Color deathReasonColor = Color.WHITE;
     @ConfigEntry public boolean score = false;
+    @ConfigEntry public boolean respawnButton = false;
+    @ConfigEntry public boolean titleScreenButton = false;
     @ConfigEntry public boolean showCoords = false;
     @ConfigEntry public Color coordsColor = Color.WHITE;
     @ConfigEntry public boolean sendCoordsInChat = false;
@@ -92,6 +94,32 @@ public class YouWereSlainConfig {
             textGroup.option(deathReasonColor);
             textGroup.option(score);
 
+            var buttonsGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("youwereslain.buttons.group"))
+                    .tooltip(Text.translatable("youwereslain.buttons.group.tooltip"));
+            var respawnButton = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.button.respawn"))
+                    .tooltip(Text.translatable("youwereslain.button.respawn.tooltip"))
+                    .binding(
+                            defaults.respawnButton,
+                            () -> config.respawnButton,
+                            val -> config.respawnButton = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
+            var titleScreenButton = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.button.title"))
+                    .tooltip(Text.translatable("youwereslain.button.title.tooltip"))
+                    .binding(
+                            defaults.titleScreenButton,
+                            () -> config.titleScreenButton,
+                            val -> config.titleScreenButton = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
+            buttonsGroup.option(respawnButton);
+            buttonsGroup.option(titleScreenButton);
+
             var coordGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("youwereslain.coord.group"))
                     .tooltip(Text.translatable("youwereslain.coord.group.tooltip"));
@@ -128,6 +156,7 @@ public class YouWereSlainConfig {
             coordGroup.option(coordsColors);
             coordGroup.option(sendCoordsInChat);
             defaultCategoryBuilder.group(textGroup.build());
+            defaultCategoryBuilder.group(buttonsGroup.build());
             defaultCategoryBuilder.group(coordGroup.build());
             return builder
                     .title(Text.translatable("youwereslain.title"))
