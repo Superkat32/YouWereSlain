@@ -86,6 +86,15 @@ public class YouWereSlainConfig {
                     )
                     .controller(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
+            textGroup.option(deathMessage);
+            textGroup.option(deathMessageColor);
+            textGroup.option(deathReason);
+            textGroup.option(deathReasonColor);
+            textGroup.option(score);
+
+            var coordGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("youwereslain.coord.group"))
+                    .tooltip(Text.translatable("youwereslain.coord.group.tooltip"));
             var showCoords = Option.createBuilder(Boolean.class)
                     .name(Text.translatable("youwereslain.showcoords"))
                     .tooltip(Text.translatable("youwereslain.showcoords.tooltip"))
@@ -115,16 +124,11 @@ public class YouWereSlainConfig {
                     )
                     .controller(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
-            textGroup.option(deathMessage);
-            textGroup.option(deathMessageColor);
-            textGroup.option(deathReason);
-            textGroup.option(deathReasonColor);
-            textGroup.option(score);
-            textGroup.option(showCoords);
-            textGroup.option(coordsColors);
-            textGroup.option(sendCoordsInChat);
+            coordGroup.option(showCoords);
+            coordGroup.option(coordsColors);
+            coordGroup.option(sendCoordsInChat);
             defaultCategoryBuilder.group(textGroup.build());
-
+            defaultCategoryBuilder.group(coordGroup.build());
             return builder
                     .title(Text.translatable("youwereslain.title"))
                     .category(defaultCategoryBuilder.build());

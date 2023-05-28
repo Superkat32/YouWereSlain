@@ -107,7 +107,9 @@ public class ExampleMixin extends Screen {
 			int deathcoordscolor = INSTANCE.getConfig().coordsColor.getRGB();
 			drawCenteredText(matrices, this.textRenderer, this.deathCoords, this.width / 2, 112, deathcoordscolor);
 		} else {
-			LOGGER.warn("DEATH COORDS NULL");
+			if(ticksSinceDeath == 3) {
+				LOGGER.warn("DEATH COORDS NULL");
+			}
 		}
 
 		//Button stuff
