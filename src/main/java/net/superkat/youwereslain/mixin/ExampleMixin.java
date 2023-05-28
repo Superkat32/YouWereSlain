@@ -87,7 +87,7 @@ public class ExampleMixin extends Screen {
 			this.scoreText = Text.translatable("deathScreen.score").append(": ").append(Text.literal(Integer.toString(this.client.player.getScore())).formatted(Formatting.YELLOW));
 		}
 		this.deathCoords = Text.of(this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ());
-		this.deathCoordsMessage = Text.of("Death coordinates: " + this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ());
+		this.deathCoordsMessage = Text.literal("Death coordinates: " + this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ()).formatted(Formatting.RED);
 	}
 
 	@Override
