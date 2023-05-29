@@ -3,7 +3,7 @@
 	"id": "youwereslain",
 	"version": "${version}",
 	"name": "You were slain...",
-	"description": "Customize the death screen. Includes respawn delay.",
+	"description": "Customize the death screen unlike ever before!",
 	"authors": [
 		"Superkat32"
 	],
