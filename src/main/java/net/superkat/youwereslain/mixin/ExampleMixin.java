@@ -2,6 +2,7 @@ package net.superkat.youwereslain.mixin;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.screen.*;
+import net.minecraft.client.gui.screen.option.MouseOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
@@ -20,17 +21,21 @@ import static net.superkat.youwereslain.YouWereSlainConfig.INSTANCE;
 import static net.superkat.youwereslain.YouWereSlainMain.LOGGER;
 
 @Mixin(DeathScreen.class)
-public class ExampleMixin extends Screen {
+public abstract class ExampleMixin extends Screen {
 
 //	@Shadow @Nullable protected abstract Style getTextComponentUnderMouse(int mouseX);
 
+	public boolean showRespawnButton = INSTANCE.getConfig().respawnButton;
+	public boolean showTitleScreenButton = INSTANCE.getConfig().titleScreenButton;
+	public boolean overrideButtonOptions = true;
+	public boolean shiftIsHeldDown = false;
+	public int ticksSinceShiftPress;
 	public int ticksSinceDeath;
 	String respawnMessage;
 	public int ticksUntilRespawn;
 	public int secondsUntilRespawn;
 	public int respawnDelayTicks = INSTANCE.getConfig().respawnDelay * 20;
 	public int ticksToSeconds;
-
 	private Text message; //The player's death message
 	public final boolean isHardcore;
 	private Text scoreText;
@@ -52,12 +57,11 @@ public class ExampleMixin extends Screen {
 		ticksUntilRespawn = respawnDelayTicks;
 		secondsUntilRespawn = respawnDelayTicks / 20;
 		ticksToSeconds = 0;
+		ticksSinceShiftPress = 0;
 		this.buttons.clear();
-		if(!INSTANCE.getConfig().respawnButton && !INSTANCE.getConfig().titleScreenButton) {
-			LOGGER.info("No buttons!");
-		} else {
+		if(showRespawnButton || showTitleScreenButton) {
 			//Respawn or spectate button
-			if(INSTANCE.getConfig().respawnButton) {
+			if(showRespawnButton) {
 				this.buttons.add(this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, this.isHardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), button -> {
 					this.client.player.requestRespawn();
 					this.client.setScreen(null);
@@ -65,7 +69,7 @@ public class ExampleMixin extends Screen {
 			}
 
 			//Exit game button
-			if(INSTANCE.getConfig().titleScreenButton) {
+			if(showTitleScreenButton) {
 				this.buttons.add(this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 96, 200, 20, Text.translatable("deathScreen.titleScreen"), button -> {
 					if (this.isHardcore) {
 						this.quitLevel();
@@ -125,13 +129,13 @@ public class ExampleMixin extends Screen {
 		drawCenteredText(matrices, this.textRenderer, INSTANCE.getConfig().deathMessage, this.width / 2 / 2, 30, deathmessagecolor);
 
 		//Respawn timer renderer
-		if(!INSTANCE.getConfig().respawnButton && INSTANCE.getConfig().respawnTimer) {
+		if(INSTANCE.getConfig().respawnTimer && !showRespawnButton) {
 			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2 / 2, 68, 16777215);
 		}
 		matrices.pop();
 
 		//Respawn timer renderer
-		if(INSTANCE.getConfig().respawnButton && INSTANCE.getConfig().respawnTimer) {
+		if(INSTANCE.getConfig().respawnTimer && showRespawnButton) {
 			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2, 123, 16777215);
 		}
 
@@ -158,7 +162,7 @@ public class ExampleMixin extends Screen {
 		}
 
 		//Button stuff
-		if(INSTANCE.getConfig().respawnButton || INSTANCE.getConfig().titleScreenButton) {
+		if(showRespawnButton || showTitleScreenButton) {
 			if (this.message != null && mouseY > 85 && mouseY < 85 + this.textRenderer.fontHeight) {
 				Style style = this.getTextComponentUnderMouse(mouseX);
 				this.renderTextHoverEffect(matrices, style, mouseX, mouseY);
@@ -167,6 +171,14 @@ public class ExampleMixin extends Screen {
 			for (ButtonWidget buttonWidget : this.buttons) {
 				buttonWidget.render(matrices, mouseX, mouseY, delta);
 			}
+		}
+
+		if(shiftIsHeldDown) {
+			String emergencyRespawnString = "Emergency respawn button activating in <time> seconds";
+			float determineTime = 1.5f - (ticksSinceShiftPress / 20f);
+			String formattedTime = String.format("%.1f", determineTime);
+			Text emergencyRespawn = Text.of(emergencyRespawnString.replaceAll("<time>", formattedTime));
+			drawCenteredText(matrices, this.textRenderer, emergencyRespawn, this.width / 2, 175, 12632256);
 		}
 
 //		super.render(matrices, mouseX, mouseY, delta);
@@ -188,18 +200,48 @@ public class ExampleMixin extends Screen {
 
 	@Inject(method = "tick", at = @At("RETURN"))
 	private void tick(CallbackInfo ci) {
+		//Counting ticks stuff
 		super.tick();
 		++this.ticksToSeconds;
 		--this.ticksUntilRespawn;
+
+		//Respawning message
 		respawnMessage = INSTANCE.getConfig().respawningMessage;
 		this.respawnText = Text.of(respawnMessage.replaceAll("<time>", String.valueOf(secondsUntilRespawn)));
+
+		//Chat death coords message
 		if(ticksSinceDeath == 3 && INSTANCE.getConfig().sendCoordsInChat) {
 			this.client.inGameHud.getChatHud().addMessage(deathCoordsMessage);
 		}
+
+		//Second counter
 		if(ticksToSeconds == 20) {
 			--secondsUntilRespawn;
 			ticksToSeconds = 0;
 		}
+
+		if(INSTANCE.getConfig().shiftOverridesDelay) {
+//			int test = 0;
+//			LOGGER.info(String.valueOf(GLFW.GLFW_MOUSE_BUTTON_LEFT));
+			if(MouseOptionsScreen.hasShiftDown() && overrideButtonOptions && ticksSinceShiftPress == 30) {
+				LOGGER.info("Shift has been pressed!");
+				showRespawnButton = true;
+				overrideButtonOptions = false;
+				shiftIsHeldDown = false;
+				this.buttons.add(this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, this.isHardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), button -> {
+					this.client.player.requestRespawn();
+					this.client.setScreen(null);
+				})));
+			} else if(MouseOptionsScreen.hasShiftDown() && overrideButtonOptions) {
+				ticksSinceShiftPress++;
+				shiftIsHeldDown = true;
+			} else if(!MouseOptionsScreen.hasShiftDown()) {
+				ticksSinceShiftPress = 0;
+				shiftIsHeldDown = false;
+			}
+		}
+
+		//Respawning
 		if (this.ticksUntilRespawn == 0) {
 			for (ButtonWidget buttonWidget : this.buttons) {
 				buttonWidget.active = true;
