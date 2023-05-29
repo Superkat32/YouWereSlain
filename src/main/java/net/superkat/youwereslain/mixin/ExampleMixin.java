@@ -119,8 +119,14 @@ public abstract class ExampleMixin extends Screen {
 	@Inject(method = "render", at = @At("HEAD"), cancellable = true)
 	private void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		ci.cancel(); //Done to prevent the default death screen from rendering
-		//Red death gradient renderer
-		this.fillGradient(matrices, 0, 0, this.width, this.height, 1615855616, -1602211792);
+		//Death gradient renderer
+		if(INSTANCE.getConfig().useCustomGradients) {
+			int gradientStart = INSTANCE.getConfig().gradientStart.hashCode();
+			int gradientEnd = INSTANCE.getConfig().gradientEnd.hashCode();
+			this.fillGradient(matrices, 0, 0, this.width, this.height, gradientStart, gradientEnd);
+		} else {
+			this.fillGradient(matrices, 0, 0, this.width, this.height, 0x60500000, -1602211792);
+		}
 		matrices.push();
 		matrices.scale(2.0F, 2.0F, 2.0F);
 

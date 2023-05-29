@@ -32,6 +32,9 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean showCoords = false;
     @ConfigEntry public Color coordsColor = Color.WHITE;
     @ConfigEntry public boolean sendCoordsInChat = false;
+    @ConfigEntry public boolean useCustomGradients = false;
+    @ConfigEntry public Color gradientStart = new Color(0x60500000, true);
+    @ConfigEntry public Color gradientEnd = new Color(-1602211792, true);
     @ConfigEntry public boolean respawnTimer = true;
     @ConfigEntry public int respawnDelay = 15;
     @ConfigEntry public String respawningMessage = "Respawning in <time>";
@@ -174,6 +177,41 @@ public class YouWereSlainConfig {
             coordGroup.option(coordsColors);
             coordGroup.option(sendCoordsInChat);
 
+            var gradientGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("youwereslain.gradient.group"))
+                    .tooltip(Text.translatable("youwereslain.gradient.group.tooltip"));
+            var gradientStart = Option.createBuilder(Color.class)
+                    .name(Text.translatable("youwereslain.gradientstart.color"))
+                    .binding(
+                            defaults.gradientStart,
+                            () -> config.gradientStart,
+                            val -> config.gradientStart = val
+                    )
+                    .controller(opt -> new ColorController(opt, true))
+                    .build();
+            var gradientEnd = Option.createBuilder(Color.class)
+                    .name(Text.translatable("youwereslain.gradientend.color"))
+                    .binding(
+                            defaults.gradientEnd,
+                            () -> config.gradientEnd,
+                            val -> config.gradientEnd = val
+                    )
+                    .controller(opt -> new ColorController(opt, true))
+                    .build();
+            var useGradients = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.gradient"))
+                    .tooltip(Text.translatable("youwereslain.gradient.tooltip"))
+                    .binding(
+                            defaults.useCustomGradients,
+                            () -> config.useCustomGradients,
+                            val -> config.useCustomGradients = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
+            gradientGroup.option(useGradients);
+            gradientGroup.option(gradientStart);
+            gradientGroup.option(gradientEnd);
+
             var respawnGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("youwereslain.respawn.group"))
                     .tooltip(Text.translatable("youwereslain.respawn.group.tooltip"));
@@ -248,6 +286,7 @@ public class YouWereSlainConfig {
             defaultCategoryBuilder.group(textGroup.build());
             defaultCategoryBuilder.group(buttonsGroup.build());
             defaultCategoryBuilder.group(coordGroup.build());
+            defaultCategoryBuilder.group(gradientGroup.build());
             defaultCategoryBuilder.group(respawnGroup.build());
             return builder
                     .title(Text.translatable("youwereslain.title"))
