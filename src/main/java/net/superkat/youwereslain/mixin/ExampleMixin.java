@@ -129,14 +129,15 @@ public abstract class ExampleMixin extends Screen {
 		drawCenteredText(matrices, this.textRenderer, INSTANCE.getConfig().deathMessage, this.width / 2 / 2, 30, deathmessagecolor);
 
 		//Respawn timer renderer
+		int respawnMessageColor = INSTANCE.getConfig().respawnMessageColor.getRGB();
 		if(INSTANCE.getConfig().respawnTimer && !showRespawnButton) {
-			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2 / 2, 68, 16777215);
+			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2 / 2, 68, respawnMessageColor);
 		}
 		matrices.pop();
 
 		//Respawn timer renderer
 		if(INSTANCE.getConfig().respawnTimer && showRespawnButton) {
-			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2, 123, 16777215);
+			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2, 123, respawnMessageColor);
 		}
 
 		//Death message text renderer
