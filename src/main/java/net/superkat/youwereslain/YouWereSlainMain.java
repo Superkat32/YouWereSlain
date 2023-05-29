@@ -10,7 +10,6 @@ public class YouWereSlainMain implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
-        LOGGER.info("Hello Fabric world!");
+        LOGGER.info("You were slain has been loaded");
     }
 }

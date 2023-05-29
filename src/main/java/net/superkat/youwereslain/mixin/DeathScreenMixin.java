@@ -82,14 +82,12 @@ public abstract class DeathScreenMixin extends Screen {
 					confirmScreen.disableButtons(20);
 				})));
 			}
-
 			for (ButtonWidget buttonWidget : this.buttons) {
 				buttonWidget.active = false;
 			}
 		}
 
 		if(INSTANCE.getConfig().score) {
-			//Sets the score text
 			this.scoreText = Text.translatable("deathScreen.score").append(": ").append(Text.literal(Integer.toString(this.client.player.getScore())).formatted(Formatting.YELLOW));
 		}
 		this.deathCoords = Text.of(this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ());
@@ -160,11 +158,11 @@ public abstract class DeathScreenMixin extends Screen {
 			drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, scorecolor);
 		}
 
+		//Death coords text renderer
 		if(this.deathCoords != null && INSTANCE.getConfig().showCoords) {
 			int deathcoordscolor = INSTANCE.getConfig().coordsColor.getRGB();
 			drawCenteredText(matrices, this.textRenderer, this.deathCoords, this.width / 2, 112, deathcoordscolor);
-			//TODO fix issue where log says player pos is null because showcoords is disabled
-		} else {
+		} else if (INSTANCE.getConfig().showCoords){
 			if(ticksSinceDeath == 3) {
 				LOGGER.warn("DEATH COORDS NULL");
 			}
@@ -182,6 +180,7 @@ public abstract class DeathScreenMixin extends Screen {
 			}
 		}
 
+		//Emergency respawn button text renderer
 		if(shiftIsHeldDown && !showRespawnButton) {
 			String emergencyRespawnString = INSTANCE.getConfig().emergencyRespawnMessage;
 			float determineTime = 1.5f - (ticksSinceShiftPress / 20f);
@@ -189,8 +188,6 @@ public abstract class DeathScreenMixin extends Screen {
 			Text emergencyRespawn = Text.of(emergencyRespawnString.replaceAll("<time>", formattedTime));
 			drawCenteredText(matrices, this.textRenderer, emergencyRespawn, this.width / 2, 185, 12632256);
 		}
-
-//		super.render(matrices, mouseX, mouseY, delta);
 	}
 
 	@Nullable
@@ -238,10 +235,8 @@ public abstract class DeathScreenMixin extends Screen {
 		}
 
 		if(INSTANCE.getConfig().shiftOverridesDelay) {
-//			int test = 0;
-//			LOGGER.info(String.valueOf(GLFW.GLFW_MOUSE_BUTTON_LEFT));
 			if(MouseOptionsScreen.hasShiftDown() && overrideButtonOptions && ticksSinceShiftPress == 30) {
-				LOGGER.info("Shift has been pressed!");
+//				LOGGER.info("Shift has been pressed!");
 				showRespawnButton = true;
 				overrideButtonOptions = false;
 				shiftIsHeldDown = false;
