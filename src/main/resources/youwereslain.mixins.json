@@ -3,7 +3,7 @@
 	"package": "net.superkat.youwereslain.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ExampleMixin"
+      "DeathScreenMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

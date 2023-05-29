@@ -21,9 +21,8 @@ import static net.superkat.youwereslain.YouWereSlainConfig.INSTANCE;
 import static net.superkat.youwereslain.YouWereSlainMain.LOGGER;
 
 @Mixin(DeathScreen.class)
-public abstract class ExampleMixin extends Screen {
-
-//	@Shadow @Nullable protected abstract Style getTextComponentUnderMouse(int mouseX);
+public abstract class DeathScreenMixin extends Screen {
+	//Welcome to the most spaghetti of spaghetti code there i
 
 	public boolean showRespawnButton = INSTANCE.getConfig().respawnButton;
 	public boolean showTitleScreenButton = INSTANCE.getConfig().titleScreenButton;
@@ -46,7 +45,7 @@ public abstract class ExampleMixin extends Screen {
 	public boolean isHudHiddenByMod;
 	private final List<ButtonWidget> buttons = Lists.newArrayList();
 
-	public ExampleMixin(@Nullable Text message, boolean isHardcore) {
+	public DeathScreenMixin(@Nullable Text message, boolean isHardcore) {
 		super(Text.of(""));
 		this.message = message;
 		this.isHardcore = isHardcore;
