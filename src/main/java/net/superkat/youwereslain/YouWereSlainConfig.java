@@ -181,6 +181,16 @@ public class YouWereSlainConfig {
             var gradientGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("youwereslain.gradient.group"))
                     .tooltip(Text.translatable("youwereslain.gradient.group.tooltip"));
+            var useGradients = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.gradient"))
+                    .tooltip(Text.translatable("youwereslain.gradient.tooltip"))
+                    .binding(
+                            defaults.useCustomGradients,
+                            () -> config.useCustomGradients,
+                            val -> config.useCustomGradients = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             var gradientStart = Option.createBuilder(Color.class)
                     .name(Text.translatable("youwereslain.gradientstart.color"))
                     .binding(
@@ -198,16 +208,6 @@ public class YouWereSlainConfig {
                             val -> config.gradientEnd = val
                     )
                     .controller(opt -> new ColorController(opt, true))
-                    .build();
-            var useGradients = Option.createBuilder(Boolean.class)
-                    .name(Text.translatable("youwereslain.gradient"))
-                    .tooltip(Text.translatable("youwereslain.gradient.tooltip"))
-                    .binding(
-                            defaults.useCustomGradients,
-                            () -> config.useCustomGradients,
-                            val -> config.useCustomGradients = val
-                    )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
             gradientGroup.option(useGradients);
             gradientGroup.option(gradientStart);

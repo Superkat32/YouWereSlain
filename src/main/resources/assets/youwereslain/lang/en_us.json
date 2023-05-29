@@ -30,6 +30,13 @@
   "youwereslain.chatcoords": "Chat Death Coordinates(You Only)",
   "youwereslain.chatcoords.tooltip": "Send a chat message containing your death coordinates that only you can see",
 
+  "youwereslain.gradient.group": "Gradient",
+  "youwereslain.gradient.group.tooltip": "All config options related to the death gradient",
+  "youwereslain.gradient": "Use Custom Gradient Colors",
+  "youwereslain.gradient.tooltip": "If enabled, the two options below will be used for the death gradient colors instead of the default colors",
+  "youwereslain.gradientstart.color": "Top",
+  "youwereslain.gradientend.color": "Bottom",
+
   "youwereslain.respawn.group": "Respawning",
   "youwereslain.respawn.group.tooltip": "All config options related to respawning",
   "youwereslain.timer": "Respawn Delay Text",
@@ -44,6 +51,8 @@
   "youwereslain.delayoverride": "Emergency Respawn Button Override",
   "youwereslain.delayoverride.tooltip": "Enable the ability to hold shift on the death screen to activate an emergency respawn button",
   "youwereslain.emergencyrespawn": "Emergency Respawn Message",
-  "youwereslain.emergencyrespawn.tooltip": "Text that alerts the user they are about to activate the emergency respawn button"
+  "youwereslain.emergencyrespawn.tooltip": "Text that alerts the user they are about to activate the emergency respawn button",
+  "youwereslain.hud": "Hide HUD Upon Death",
+  "youwereslain.hud.tooltip": "If the HUD isn't hidden upon death, this option will hide it until respawning"
 }
 
