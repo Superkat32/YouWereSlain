@@ -22,7 +22,22 @@ import static net.superkat.youwereslain.YouWereSlainMain.LOGGER;
 
 @Mixin(DeathScreen.class)
 public abstract class DeathScreenMixin extends Screen {
-	//Welcome to the most spaghetti of spaghetti code there i
+	//Welcome to the most spaghetti of spaghetti code there is
+
+	//KNOWN COMPATIBILITIES
+	//You're in Grave Danger
+	//Universal Graves
+	//Gravestones
+	//Forgotten Graves
+	//Your Items Are Safe
+
+	//KNOWN INCOMPATIBILITIES
+	//Respawn Delay(turns the player into a spectator instead of seeing the death screen upon death)
+	//Better Respawn(Makes graves mods not work)
+
+	//FIXME - INCOMPATIBILITY with Better Respawn mod(causes ticking entity ?????)
+	//FIXME - Chat coords doesn't seem to work outside of dev env (try client.player.sendMessage() ?)
+	//FIXME - Respawn buttons don't appear greyed out outside of dev env (try overriding or mixing into the button style method ?)
 
 	public boolean showRespawnButton = INSTANCE.getConfig().respawnButton;
 	public boolean showTitleScreenButton = INSTANCE.getConfig().titleScreenButton;
