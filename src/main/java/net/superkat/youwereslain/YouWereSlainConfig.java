@@ -211,7 +211,6 @@ public class YouWereSlainConfig {
                     .build();
             var respawnMessageColor = Option.createBuilder(Color.class)
                     .name(Text.translatable("youwereslain.respawnmessage.color"))
-                    .tooltip(Text.translatable("youwereslain.respawnmessage.color.tooltip"))
                     .binding(
                             defaults.respawnMessageColor,
                             () -> config.respawnMessageColor,

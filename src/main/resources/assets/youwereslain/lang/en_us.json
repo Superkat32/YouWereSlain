@@ -1,7 +1,7 @@
 {
   "youwereslain.title": "You Were Slain Config",
 
-  "youwereslain.category.default": "Death Screen Category",
+  "youwereslain.category.default": "Death Screen",
 
   "youwereslain.text.group": "Text",
   "youwereslain.text.group.tooltip": "All config options related to text",
@@ -39,6 +39,11 @@
   "youwereslain.delay.tooltip": "The delay(in seconds) until you respawn after death",
   "youwereslain.respawnmessage": "Respawning Message",
   "youwereslain.respawnmessage.tooltip": "The message telling you how long you have until you respawn",
-  "youwereslain.respawnmessage.tooltip.time": "<time> is the seconds left until you respawn"
+  "youwereslain.respawnmessage.tooltip.time": "<time> is the seconds left until you respawn",
+  "youwereslain.respawnmessage.color": "Respawn Message Color",
+  "youwereslain.delayoverride": "Emergency Respawn Button Override",
+  "youwereslain.delayoverride.tooltip": "Enable the ability to hold shift on the death screen to activate an emergency respawn button",
+  "youwereslain.emergencyrespawn": "Emergency Respawn Message",
+  "youwereslain.emergencyrespawn.tooltip": "Text that alerts the user they are about to activate the emergency respawn button"
 }
 
