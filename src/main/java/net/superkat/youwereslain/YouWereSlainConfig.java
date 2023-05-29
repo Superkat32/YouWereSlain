@@ -41,6 +41,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public Color respawnMessageColor = new Color(240, 130, 132);
     @ConfigEntry public boolean shiftOverridesDelay = false;
     @ConfigEntry public String emergencyRespawnMessage = "Emergency respawn button activating in <time> seconds";
+    @ConfigEntry public boolean disableHud = true;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -276,12 +277,23 @@ public class YouWereSlainConfig {
                     )
                     .controller(StringController::new)
                     .build();
+            var disableHud = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.hud"))
+                    .tooltip(Text.translatable("youwereslain.hud.tooltip"))
+                    .binding(
+                            defaults.disableHud,
+                            () -> config.disableHud,
+                            val -> config.disableHud = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             respawnGroup.option(respawnDelayText);
             respawnGroup.option(respawnDelay);
             respawnGroup.option(respawningMessage);
             respawnGroup.option(respawnMessageColor);
             respawnGroup.option(shiftOverridesDelay);
             respawnGroup.option(emergencyRespawnMessage);
+            respawnGroup.option(disableHud);
 
             defaultCategoryBuilder.group(textGroup.build());
             defaultCategoryBuilder.group(buttonsGroup.build());

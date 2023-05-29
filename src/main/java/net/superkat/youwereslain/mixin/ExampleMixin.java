@@ -42,6 +42,8 @@ public abstract class ExampleMixin extends Screen {
 	private Text respawnText = Text.of("0");
 	private Text deathCoords;
 	private Text deathCoordsMessage;
+	public boolean wasHudHidden;
+	public boolean isHudHiddenByMod;
 	private final List<ButtonWidget> buttons = Lists.newArrayList();
 
 	public ExampleMixin(@Nullable Text message, boolean isHardcore) {
@@ -58,6 +60,7 @@ public abstract class ExampleMixin extends Screen {
 		secondsUntilRespawn = respawnDelayTicks / 20;
 		ticksToSeconds = 0;
 		ticksSinceShiftPress = 0;
+		wasHudHidden = client.options.hudHidden;
 		this.buttons.clear();
 		if(showRespawnButton || showTitleScreenButton) {
 			//Respawn or spectate button
@@ -216,6 +219,14 @@ public abstract class ExampleMixin extends Screen {
 		respawnMessage = INSTANCE.getConfig().respawningMessage;
 		this.respawnText = Text.of(respawnMessage.replaceAll("<time>", String.valueOf(secondsUntilRespawn)));
 
+		//Hud disabling
+		if(ticksSinceDeath == 1 && INSTANCE.getConfig().disableHud) {
+			if(!wasHudHidden) {
+            	this.client.options.hudHidden = true;
+				isHudHiddenByMod = true;
+			}
+		}
+
 		//Chat death coords message
 		if(ticksSinceDeath == 3 && INSTANCE.getConfig().sendCoordsInChat) {
 			this.client.inGameHud.getChatHud().addMessage(deathCoordsMessage);
@@ -238,6 +249,9 @@ public abstract class ExampleMixin extends Screen {
 				this.buttons.add(this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, this.isHardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), button -> {
 					this.client.player.requestRespawn();
 					this.client.setScreen(null);
+					if(!wasHudHidden && isHudHiddenByMod) {
+						this.client.options.hudHidden = false;
+					}
 				})));
 			} else if(MouseOptionsScreen.hasShiftDown() && overrideButtonOptions) {
 				ticksSinceShiftPress++;
@@ -254,6 +268,9 @@ public abstract class ExampleMixin extends Screen {
 				buttonWidget.active = true;
 			}
 			this.client.player.requestRespawn();
+			if(!wasHudHidden && isHudHiddenByMod) {
+				this.client.options.hudHidden = false;
+			}
 		}
 	}
 }
