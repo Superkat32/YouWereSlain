@@ -173,12 +173,12 @@ public abstract class ExampleMixin extends Screen {
 			}
 		}
 
-		if(shiftIsHeldDown) {
-			String emergencyRespawnString = "Emergency respawn button activating in <time> seconds";
+		if(shiftIsHeldDown && !showRespawnButton) {
+			String emergencyRespawnString = INSTANCE.getConfig().emergencyRespawnMessage;
 			float determineTime = 1.5f - (ticksSinceShiftPress / 20f);
 			String formattedTime = String.format("%.1f", determineTime);
 			Text emergencyRespawn = Text.of(emergencyRespawnString.replaceAll("<time>", formattedTime));
-			drawCenteredText(matrices, this.textRenderer, emergencyRespawn, this.width / 2, 175, 12632256);
+			drawCenteredText(matrices, this.textRenderer, emergencyRespawn, this.width / 2, 185, 12632256);
 		}
 
 //		super.render(matrices, mouseX, mouseY, delta);

@@ -36,6 +36,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public int respawnDelay = 15;
     @ConfigEntry public String respawningMessage = "Respawning in <time>";
     @ConfigEntry public boolean shiftOverridesDelay = false;
+    @ConfigEntry public String emergencyRespawnMessage = "Emergency respawn button activating in <time> seconds";
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -217,10 +218,21 @@ public class YouWereSlainConfig {
                     )
                     .controller(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
+            var emergencyRespawnMessage = Option.createBuilder(String.class)
+                    .name(Text.translatable("youwereslain.emergencyrespawn"))
+                    .tooltip(Text.translatable("youwereslain.emergencyrespawn.tooltip"))
+                    .binding(
+                            defaults.emergencyRespawnMessage,
+                            () -> config.emergencyRespawnMessage,
+                            val -> config.emergencyRespawnMessage = val
+                    )
+                    .controller(StringController::new)
+                    .build();
             respawnGroup.option(respawnDelayText);
             respawnGroup.option(respawnDelay);
             respawnGroup.option(respawningMessage);
             respawnGroup.option(shiftOverridesDelay);
+            respawnGroup.option(emergencyRespawnMessage);
 
             defaultCategoryBuilder.group(textGroup.build());
             defaultCategoryBuilder.group(buttonsGroup.build());
