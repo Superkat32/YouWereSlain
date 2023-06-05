@@ -35,6 +35,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean useCustomGradients = false;
     @ConfigEntry public Color gradientStart = new Color(0x60500000, true);
     @ConfigEntry public Color gradientEnd = new Color(-1602211792, true);
+    //TODO - Add a boolean to enable/disable respawn delay
     @ConfigEntry public boolean respawnTimer = true;
     @ConfigEntry public int respawnDelay = 15;
     @ConfigEntry public String respawningMessage = "Respawning in <time>";

@@ -30,12 +30,11 @@ public abstract class DeathScreenMixin extends Screen {
 	//Gravestones
 	//Forgotten Graves
 	//Your Items Are Safe
+	//Better Respawn
 
 	//KNOWN INCOMPATIBILITIES
 	//Respawn Delay(turns the player into a spectator instead of seeing the death screen upon death)
-	//Better Respawn(Makes graves mods not work)
 
-	//FIXME - INCOMPATIBILITY with Better Respawn mod(causes ticking entity ?????)
 	//FIXME - Chat coords doesn't seem to work outside of dev env (try client.player.sendMessage() ?)
 	//FIXME - Respawn buttons don't appear greyed out outside of dev env (try overriding or mixing into the button style method ?)
 
