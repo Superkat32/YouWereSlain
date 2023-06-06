@@ -35,7 +35,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean useCustomGradients = false;
     @ConfigEntry public Color gradientStart = new Color(0x60500000, true);
     @ConfigEntry public Color gradientEnd = new Color(-1602211792, true);
-    //TODO - Add a boolean to enable/disable respawn delay
+    @ConfigEntry public boolean shouldRespawnDelay = true;
     @ConfigEntry public boolean respawnTimer = true;
     @ConfigEntry public int respawnDelay = 15;
     @ConfigEntry public String respawningMessage = "Respawning in <time>";
@@ -217,10 +217,19 @@ public class YouWereSlainConfig {
             var respawnGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("youwereslain.respawn.group"))
                     .tooltip(Text.translatable("youwereslain.respawn.group.tooltip"));
+            var shouldRespawnDelay = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.respawndelay"))
+                    .tooltip(Text.translatable("youwereslain.respawndelay.tooltip"))
+                    .binding(
+                            defaults.shouldRespawnDelay,
+                            () -> config.shouldRespawnDelay,
+                            val -> config.shouldRespawnDelay = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             var respawnDelayText = Option.createBuilder(Boolean.class)
                     .name(Text.translatable("youwereslain.timer"))
                     .tooltip(Text.translatable("youwereslain.timer.tooltip"))
-                    .tooltip(Text.translatable("youwereslain.timer.tooltip.note"))
                     .binding(
                             defaults.respawnTimer,
                             () -> config.respawnTimer,
@@ -288,6 +297,7 @@ public class YouWereSlainConfig {
                     )
                     .controller(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
+            respawnGroup.option(shouldRespawnDelay);
             respawnGroup.option(respawnDelayText);
             respawnGroup.option(respawnDelay);
             respawnGroup.option(respawningMessage);

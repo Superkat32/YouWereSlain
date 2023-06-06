@@ -46,7 +46,6 @@ public abstract class DeathScreenMixin extends Screen {
 	//FIXME - FIXED - Respawn buttons don't grey out
 	//FIXME - FIXED - HUD doesn't unhide if the respawn button from the confirm title screen button screen was used
 	//FIXME - FIXED(HOPEFULLY) - HUD doesn't always become unhidden when it should
-    //random comment to hopefully fix Git being weird
 	public boolean showRespawnButton = INSTANCE.getConfig().respawnButton;
 	public boolean showTitleScreenButton = INSTANCE.getConfig().titleScreenButton;
 	public boolean overrideButtonOptions = true;
@@ -79,13 +78,21 @@ public abstract class DeathScreenMixin extends Screen {
 
 	@Inject(method = "init", at = @At("RETURN"))
 	private void init(CallbackInfo callbackInfo) {
-		LOGGER.info("You died...");
 		ticksSinceDeath = 0;
 		ticksUntilRespawn = respawnDelayTicks;
 		secondsUntilRespawn = respawnDelayTicks / 20;
 		ticksToSeconds = 0;
 		ticksSinceShiftPress = 0;
 		wasHudHidden = this.client.options.hudHidden;
+
+		//Prevent softlock with config options
+		if(!showRespawnButton && !INSTANCE.getConfig().shouldRespawnDelay) {
+			showRespawnButton = true;
+			LOGGER.warn("Possible softlock prevented");
+			LOGGER.warn("Respawn button status: " + INSTANCE.getConfig().respawnButton);
+			LOGGER.warn("Respawn delay status: " + INSTANCE.getConfig().shouldRespawnDelay);
+		}
+
 		this.buttons.clear();
 		if(showRespawnButton || showTitleScreenButton) {
 			//Respawn or spectate button
@@ -96,6 +103,7 @@ public abstract class DeathScreenMixin extends Screen {
 					if(!wasHudHidden && hudWasHiddenByMod) {
 						this.client.options.hudHidden = false;
 					}
+					sendDeathCoords();
 				})));
 			}
 
@@ -119,6 +127,7 @@ public abstract class DeathScreenMixin extends Screen {
 			}
 		}
 
+		//Score and death coords
 		if(INSTANCE.getConfig().score) {
 			this.scoreText = Text.translatable("deathScreen.score").append(": ").append(Text.literal(Integer.toString(this.client.player.getScore())).formatted(Formatting.YELLOW));
 		}
@@ -137,6 +146,7 @@ public abstract class DeathScreenMixin extends Screen {
 		} else {
 			this.client.player.requestRespawn();
 			this.client.setScreen(null);
+			sendDeathCoords();
 		}
 	}
 
@@ -151,6 +161,7 @@ public abstract class DeathScreenMixin extends Screen {
 	@Inject(method = "render", at = @At("HEAD"), cancellable = true)
 	private void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		ci.cancel(); //Done to prevent the default death screen from rendering
+
 		//Death gradient renderer
 		if(INSTANCE.getConfig().useCustomGradients) {
 			int gradientStart = INSTANCE.getConfig().gradientStart.hashCode();
@@ -162,19 +173,22 @@ public abstract class DeathScreenMixin extends Screen {
 		matrices.push();
 		matrices.scale(2.0F, 2.0F, 2.0F);
 
+
 		//You Died! text renderer
+//		float alpha = (float) Math.min(1.0, (float) ticksSinceDeath / 10);
 		int deathmessagecolor = INSTANCE.getConfig().deathMessageColor.getRGB();
+//		int alphaColor = (deathmessagecolor & 0x00FFFFFF) | ((int) (alpha * 255) << 24);
 		drawCenteredText(matrices, this.textRenderer, INSTANCE.getConfig().deathMessage, this.width / 2 / 2, 30, deathmessagecolor);
 
 		//Respawn timer renderer
 		int respawnMessageColor = INSTANCE.getConfig().respawnMessageColor.getRGB();
-		if(INSTANCE.getConfig().respawnTimer && !showRespawnButton) {
+		if(INSTANCE.getConfig().respawnTimer && !showRespawnButton && INSTANCE.getConfig().shouldRespawnDelay) {
 			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2 / 2, 68, respawnMessageColor);
 		}
 		matrices.pop();
 
 		//Respawn timer renderer
-		if(INSTANCE.getConfig().respawnTimer && showRespawnButton) {
+		if(INSTANCE.getConfig().respawnTimer && showRespawnButton && INSTANCE.getConfig().shouldRespawnDelay) {
 			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2, 123, respawnMessageColor);
 		}
 
@@ -222,6 +236,12 @@ public abstract class DeathScreenMixin extends Screen {
 		}
 	}
 
+	private void sendDeathCoords() {
+		if(INSTANCE.getConfig().sendCoordsInChat) {
+			this.client.player.sendMessage(Text.literal(deathCoordsMessage).formatted(Formatting.RED));
+		}
+	}
+
 	@Nullable
 	private Style getTextComponentUnderMouse(int mouseX) {
 		if (this.deathReasonMessage == null) {
@@ -258,9 +278,9 @@ public abstract class DeathScreenMixin extends Screen {
 		}
 
 		//Chat death coords message
-		if(ticksUntilRespawn == respawnDelayTicks - 1 && INSTANCE.getConfig().sendCoordsInChat) {
-			this.client.player.sendMessage(Text.literal(deathCoordsMessage).formatted(Formatting.RED));
-		}
+//		if(ticksUntilRespawn == respawnDelayTicks - 1 && INSTANCE.getConfig().sendCoordsInChat) {
+//			this.client.player.sendMessage(Text.literal(deathCoordsMessage).formatted(Formatting.RED));
+//		}
 
 		//Second counter
 		if(ticksToSeconds == 20) {
@@ -280,6 +300,7 @@ public abstract class DeathScreenMixin extends Screen {
 					if(hudWasHiddenByMod) {
 						this.client.options.hudHidden = false;
 					}
+					sendDeathCoords();
 				})));
 			} else if(MouseOptionsScreen.hasShiftDown() && overrideButtonOptions) {
 				ticksSinceShiftPress++;
@@ -296,12 +317,12 @@ public abstract class DeathScreenMixin extends Screen {
 				buttonWidget.active = true;
 			}
 		}
-		LOGGER.info(String.valueOf(ticksSinceDeath));
-		if (this.ticksUntilRespawn == 0) {
+		if (this.ticksUntilRespawn == 0 && INSTANCE.getConfig().shouldRespawnDelay) {
+			this.client.player.requestRespawn();
 			if(!wasHudHidden && hudWasHiddenByMod) {
 				this.client.options.hudHidden = false;
 			}
-			this.client.player.requestRespawn();
+			sendDeathCoords();
 		}
 	}
 }
