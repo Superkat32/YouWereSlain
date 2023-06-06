@@ -35,9 +35,13 @@ public abstract class DeathScreenMixin extends Screen {
 	//KNOWN INCOMPATIBILITIES
 	//Respawn Delay(turns the player into a spectator instead of seeing the death screen upon death)
 
-	//FIXME - Chat coords doesn't seem to work outside of dev env (try client.player.sendMessage() ?)
-	//FIXME - Respawn buttons don't appear greyed out outside of dev env (try overriding or mixing into the button style method ?)
-
+	//FIXME - FIXED - Chat coords doesn't seem to work outside of dev env (try client.player.sendMessage() ?)
+	//FIXME - FIXED - Hide HUD doesn't work outside of dev env
+	//FIXME - FIXED - Respawn buttons stay greyed out outside of dev env (try overriding or mixing into the button style method ?)
+	//FIXME - FIXED - Respawn buttons are technically still working, but invisible outside of dev env
+	//FIXME - FIXED - Death reason is null (WHYYYYYYY)
+	//FIXME - Respawn buttons don't grey out
+	//FIXME - HUD doesn't always become unhidden when it should
 	public boolean showRespawnButton = INSTANCE.getConfig().respawnButton;
 	public boolean showTitleScreenButton = INSTANCE.getConfig().titleScreenButton;
 	public boolean overrideButtonOptions = true;
@@ -50,20 +54,24 @@ public abstract class DeathScreenMixin extends Screen {
 	public int respawnDelayTicks = INSTANCE.getConfig().respawnDelay * 20;
 	public int ticksToSeconds;
 	private Text message; //The player's death message
-	public final boolean isHardcore;
+	public boolean isHardcore;
 	private Text scoreText;
 	private Text respawnText = Text.of("0");
 	private Text deathCoords;
-	private Text deathCoordsMessage;
+	private String deathCoordsMessage;
 	public boolean wasHudHidden;
-	public boolean isHudHiddenByMod;
+	public boolean hudWasHiddenByMod;
 	private final List<ButtonWidget> buttons = Lists.newArrayList();
 
-	public DeathScreenMixin(@Nullable Text message, boolean isHardcore) {
+	public DeathScreenMixin() {
 		super(Text.of(""));
-		this.message = message;
-		this.isHardcore = isHardcore;
 	}
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void onInit(Text message, boolean isHardcore, CallbackInfo ci) {
+        this.message = message;
+        this.isHardcore = isHardcore;
+    }
 
 	@Inject(method = "init", at = @At("RETURN"))
 	private void init(CallbackInfo callbackInfo) {
@@ -73,12 +81,15 @@ public abstract class DeathScreenMixin extends Screen {
 		secondsUntilRespawn = respawnDelayTicks / 20;
 		ticksToSeconds = 0;
 		ticksSinceShiftPress = 0;
-		wasHudHidden = client.options.hudHidden;
+		wasHudHidden = this.client.options.hudHidden;
 		this.buttons.clear();
 		if(showRespawnButton || showTitleScreenButton) {
 			//Respawn or spectate button
 			if(showRespawnButton) {
 				this.buttons.add(this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, this.isHardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), button -> {
+					if(!wasHudHidden && hudWasHiddenByMod) {
+						this.client.options.hudHidden = false;
+					}
 					this.client.player.requestRespawn();
 					this.client.setScreen(null);
 				})));
@@ -105,7 +116,7 @@ public abstract class DeathScreenMixin extends Screen {
 			this.scoreText = Text.translatable("deathScreen.score").append(": ").append(Text.literal(Integer.toString(this.client.player.getScore())).formatted(Formatting.YELLOW));
 		}
 		this.deathCoords = Text.of(this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ());
-		this.deathCoordsMessage = Text.literal("Death coordinates: " + this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ()).formatted(Formatting.RED);
+		this.deathCoordsMessage = "Death coordinates: " + this.client.player.getBlockX() + ", " + this.client.player.getBlockY() + ", " + this.client.player.getBlockZ();
 	}
 
 	@Override
@@ -218,10 +229,12 @@ public abstract class DeathScreenMixin extends Screen {
 		return this.client.textRenderer.getTextHandler().getStyleAt(this.message, mouseX - j);
 	}
 
-	@Inject(method = "tick", at = @At("RETURN"))
+	@Inject(method = "tick", at = @At("HEAD"), cancellable = true)
 	private void tick(CallbackInfo ci) {
+		ci.cancel();
 		//Counting ticks stuff
 		super.tick();
+		++this.ticksSinceDeath;
 		++this.ticksToSeconds;
 		--this.ticksUntilRespawn;
 
@@ -230,16 +243,16 @@ public abstract class DeathScreenMixin extends Screen {
 		this.respawnText = Text.of(respawnMessage.replaceAll("<time>", String.valueOf(secondsUntilRespawn)));
 
 		//Hud disabling
-		if(ticksSinceDeath == 1 && INSTANCE.getConfig().disableHud) {
+		if(ticksUntilRespawn == respawnDelayTicks - 1 && INSTANCE.getConfig().disableHud) {
 			if(!wasHudHidden) {
-            	this.client.options.hudHidden = true;
-				isHudHiddenByMod = true;
+				this.client.options.hudHidden = true;
+				hudWasHiddenByMod = true;
 			}
 		}
 
 		//Chat death coords message
-		if(ticksSinceDeath == 3 && INSTANCE.getConfig().sendCoordsInChat) {
-			this.client.inGameHud.getChatHud().addMessage(deathCoordsMessage);
+		if(ticksUntilRespawn == respawnDelayTicks - 1 && INSTANCE.getConfig().sendCoordsInChat) {
+			this.client.player.sendMessage(Text.literal(deathCoordsMessage).formatted(Formatting.RED));
 		}
 
 		//Second counter
@@ -248,18 +261,18 @@ public abstract class DeathScreenMixin extends Screen {
 			ticksToSeconds = 0;
 		}
 
+		//Emergency respawn button
 		if(INSTANCE.getConfig().shiftOverridesDelay) {
 			if(MouseOptionsScreen.hasShiftDown() && overrideButtonOptions && ticksSinceShiftPress == 30) {
-//				LOGGER.info("Shift has been pressed!");
 				showRespawnButton = true;
 				overrideButtonOptions = false;
 				shiftIsHeldDown = false;
 				this.buttons.add(this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, this.isHardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), button -> {
-					this.client.player.requestRespawn();
-					this.client.setScreen(null);
-					if(!wasHudHidden && isHudHiddenByMod) {
+					if(!wasHudHidden && hudWasHiddenByMod) {
 						this.client.options.hudHidden = false;
 					}
+					this.client.player.requestRespawn();
+					this.client.setScreen(null);
 				})));
 			} else if(MouseOptionsScreen.hasShiftDown() && overrideButtonOptions) {
 				ticksSinceShiftPress++;
@@ -271,14 +284,16 @@ public abstract class DeathScreenMixin extends Screen {
 		}
 
 		//Respawning
-		if (this.ticksUntilRespawn == 0) {
+		if(ticksUntilRespawn == respawnDelayTicks - 20 && showRespawnButton || showTitleScreenButton) {
 			for (ButtonWidget buttonWidget : this.buttons) {
 				buttonWidget.active = true;
 			}
-			this.client.player.requestRespawn();
-			if(!wasHudHidden && isHudHiddenByMod) {
+		}
+		if (this.ticksUntilRespawn == 0) {
+			if(!wasHudHidden && hudWasHiddenByMod) {
 				this.client.options.hudHidden = false;
 			}
+			this.client.player.requestRespawn();
 		}
 	}
 }
