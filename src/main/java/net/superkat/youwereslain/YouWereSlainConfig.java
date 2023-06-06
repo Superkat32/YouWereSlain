@@ -23,6 +23,7 @@ public class YouWereSlainConfig {
 
     @ConfigEntry public String deathMessage = "You were slain...";
     @ConfigEntry public Color deathMessageColor = new Color(240, 130, 132);
+    @ConfigEntry public boolean fadeInDeathMessage = true;
     @ConfigEntry public boolean deathReason = false;
     @ConfigEntry public Color deathReasonColor = Color.WHITE;
     @ConfigEntry public boolean score = false;
@@ -72,6 +73,16 @@ public class YouWereSlainConfig {
                     )
                     .controller(ColorController::new)
                     .build();
+            var fadeInDeathMessage = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.deathmessage.fadein"))
+                    .tooltip(Text.translatable("youwereslain.deathmessage.fadein.tooltip"))
+                    .binding(
+                            defaults.fadeInDeathMessage,
+                            () -> config.fadeInDeathMessage,
+                            val -> config.fadeInDeathMessage = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             var deathReason = Option.createBuilder(Boolean.class)
                     .name(Text.translatable("youwereslain.deathreason"))
                     .tooltip(Text.translatable("youwereslain.deathreason.tooltip"))
@@ -112,6 +123,7 @@ public class YouWereSlainConfig {
                     .build();
             textGroup.option(deathMessage);
             textGroup.option(deathMessageColor);
+            textGroup.option(fadeInDeathMessage);
             textGroup.option(deathReason);
             textGroup.option(deathReasonColor);
             textGroup.option(score);

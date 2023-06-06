@@ -161,6 +161,12 @@ public abstract class DeathScreenMixin extends Screen {
 	@Inject(method = "render", at = @At("HEAD"), cancellable = true)
 	private void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		ci.cancel(); //Done to prevent the default death screen from rendering
+		int defaultFadeDelay = 7;
+		int fadeDelay;
+		int fade = 50;
+		float alpha;
+		int color;
+		int fadeColor;
 
 		//Death gradient renderer
 		if(INSTANCE.getConfig().useCustomGradients) {
@@ -175,10 +181,17 @@ public abstract class DeathScreenMixin extends Screen {
 
 
 		//You Died! text renderer
-//		float alpha = (float) Math.min(1.0, (float) ticksSinceDeath / 10);
-		int deathmessagecolor = INSTANCE.getConfig().deathMessageColor.getRGB();
-//		int alphaColor = (deathmessagecolor & 0x00FFFFFF) | ((int) (alpha * 255) << 24);
-		drawCenteredText(matrices, this.textRenderer, INSTANCE.getConfig().deathMessage, this.width / 2 / 2, 30, deathmessagecolor);
+		fadeDelay = INSTANCE.getConfig().fadeInDeathMessage ? defaultFadeDelay : 0;
+		if(ticksSinceDeath >= fadeDelay) {
+			alpha = (float) Math.min(1.0, (float) ticksSinceDeath / fade);
+			color = INSTANCE.getConfig().deathMessageColor.getRGB();
+			fadeColor = (color & 0x00FFFFFF) | ((int)(alpha * 255) << 24);
+			drawCenteredText(matrices, this.textRenderer, INSTANCE.getConfig().deathMessage, this.width / 2 / 2, 30, INSTANCE.getConfig().fadeInDeathMessage ? fadeColor : color);
+		}
+//		alpha = (float) Math.min(1.0, (float) ticksSinceDeath / 50);
+//		color = INSTANCE.getConfig().deathMessageColor.getRGB();
+//		fadeColor = (color & 0x00FFFFFF) | ((int) (alpha * 255) << 24);
+//		drawCenteredText(matrices, this.textRenderer, INSTANCE.getConfig().deathMessage, this.width / 2 / 2, 30, INSTANCE.getConfig().fadeInDeathMessage ? fadeColor : color);
 
 		//Respawn timer renderer
 		int respawnMessageColor = INSTANCE.getConfig().respawnMessageColor.getRGB();
