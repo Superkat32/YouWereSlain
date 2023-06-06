@@ -186,16 +186,29 @@ public abstract class DeathScreenMixin extends Screen {
 		}
 
 		//Respawn timer renderer
-		int respawnMessageColor = INSTANCE.getConfig().respawnMessageColor.getRGB();
-		if(INSTANCE.getConfig().respawnTimer && !showRespawnButton && INSTANCE.getConfig().shouldRespawnDelay) {
-			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2 / 2, 68, respawnMessageColor);
+		int fadeDelayRespawnMessage = INSTANCE.getConfig().fadeInRespawnMessage ? defaultFadeDelay : 0;
+		if(ticksSinceDeath >= fadeDelayRespawnMessage && INSTANCE.getConfig().respawnTimer && !showRespawnButton && INSTANCE.getConfig().shouldRespawnDelay) {
+			float alpha = (float) Math.min(1.0, (float) ticksSinceDeath / fade);
+			int color = INSTANCE.getConfig().respawnMessageColor.getRGB();
+			int fadeColor = (color & 0x00FFFFFF) | ((int)(alpha * 255) << 24);
+			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2 / 2, 68, INSTANCE.getConfig().fadeInRespawnMessage ? fadeColor : color);
 		}
+//		int respawnMessageColor = INSTANCE.getConfig().respawnMessageColor.getRGB();
+//		if(INSTANCE.getConfig().respawnTimer && !showRespawnButton && INSTANCE.getConfig().shouldRespawnDelay) {
+//			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2 / 2, 68, respawnMessageColor);
+//		}
 		matrices.pop();
 
 		//Respawn timer renderer
-		if(INSTANCE.getConfig().respawnTimer && showRespawnButton && INSTANCE.getConfig().shouldRespawnDelay) {
-			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2, 123, respawnMessageColor);
+		if(ticksSinceDeath >= fadeDelayRespawnMessage && INSTANCE.getConfig().respawnTimer && showRespawnButton && INSTANCE.getConfig().shouldRespawnDelay) {
+			float alpha = (float) Math.min(1.0, (float) ticksSinceDeath / fade);
+			int color = INSTANCE.getConfig().respawnMessageColor.getRGB();
+			int fadeColor = (color & 0x00FFFFFF) | ((int)(alpha * 255) << 24);
+			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2, 123, INSTANCE.getConfig().fadeInRespawnMessage ? fadeColor : color);
 		}
+//		if(INSTANCE.getConfig().respawnTimer && showRespawnButton && INSTANCE.getConfig().shouldRespawnDelay) {
+//			drawCenteredText(matrices, this.textRenderer, this.respawnText, this.width / 2, 123, respawnMessageColor);
+//		}
 
 		//Death reason text renderer
 		int fadeDelayDeathReason = INSTANCE.getConfig().fadeInDeathReason ? defaultFadeDelay : 0;
@@ -214,10 +227,6 @@ public abstract class DeathScreenMixin extends Screen {
 			int fadeColor = (color & 0x00FFFFFF) | ((int)(alpha * 255) << 24);
 			drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, INSTANCE.getConfig().fadeInScore ? fadeColor : color);
 		}
-//		if(this.scoreText != null && INSTANCE.getConfig().score) {
-//			int scorecolor = INSTANCE.getConfig().scoreColor.getRGB();
-//			drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, scorecolor);
-//		}
 
 		//Death coords text renderer
 		if(this.deathCoords != null && INSTANCE.getConfig().showCoords) {

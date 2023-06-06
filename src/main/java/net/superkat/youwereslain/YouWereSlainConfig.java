@@ -43,6 +43,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public int respawnDelay = 15;
     @ConfigEntry public String respawningMessage = "Respawning in <time>";
     @ConfigEntry public Color respawnMessageColor = new Color(240, 130, 132);
+    @ConfigEntry public boolean fadeInRespawnMessage = true;
     @ConfigEntry public boolean shiftOverridesDelay = false;
     @ConfigEntry public String emergencyRespawnMessage = "Emergency respawn button activating in <time> seconds";
     @ConfigEntry public boolean disableHud = false;
@@ -303,6 +304,16 @@ public class YouWereSlainConfig {
                     )
                     .controller(ColorController::new)
                     .build();
+            var fadeInRespawnMessage = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.respawnmessage.fadein"))
+                    .tooltip(Text.translatable("youwereslain.respawnmessage.fadeintooltip"))
+                    .binding(
+                            defaults.fadeInRespawnMessage,
+                            () -> config.fadeInRespawnMessage,
+                            val -> config.fadeInRespawnMessage = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             var shiftOverridesDelay = Option.createBuilder(Boolean.class)
                     .name(Text.translatable("youwereslain.delayoverride"))
                     .tooltip(Text.translatable("youwereslain.delayoverride.tooltip"))
@@ -338,6 +349,7 @@ public class YouWereSlainConfig {
             respawnGroup.option(respawnDelay);
             respawnGroup.option(respawningMessage);
             respawnGroup.option(respawnMessageColor);
+            respawnGroup.option(fadeInRespawnMessage);
             respawnGroup.option(shiftOverridesDelay);
             respawnGroup.option(emergencyRespawnMessage);
             respawnGroup.option(disableHud);
