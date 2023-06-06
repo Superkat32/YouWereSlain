@@ -205,16 +205,19 @@ public abstract class DeathScreenMixin extends Screen {
 			int fadeColor = (color & 0x00FFFFFF) | ((int)(alpha * 255) << 24);
 			drawCenteredText(matrices, this.textRenderer, this.deathReasonMessage, this.width / 2, 85, INSTANCE.getConfig().fadeInDeathReason ? fadeColor : color);
 		}
-//		if (this.deathReasonMessage != null && INSTANCE.getConfig().deathReason) {
-//            int deathreasoncolor = INSTANCE.getConfig().deathReasonColor.getRGB();
-//			drawCenteredText(matrices, this.textRenderer, this.deathReasonMessage, this.width / 2, 85, deathreasoncolor);
-//		}
 
 		//Score text renderer
-		if(this.scoreText != null && INSTANCE.getConfig().score) {
-			int scorecolor = INSTANCE.getConfig().scoreColor.getRGB();
-			drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, scorecolor);
+		int fadeDelayScore = INSTANCE.getConfig().fadeInScore ? defaultFadeDelay : 0;
+		if(ticksSinceDeath >= fadeDelayScore && this.scoreText != null && INSTANCE.getConfig().score) {
+			float alpha = (float) Math.min(1.0, (float) ticksSinceDeath / fade);
+			int color = INSTANCE.getConfig().scoreColor.getRGB();
+			int fadeColor = (color & 0x00FFFFFF) | ((int)(alpha * 255) << 24);
+			drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, INSTANCE.getConfig().fadeInScore ? fadeColor : color);
 		}
+//		if(this.scoreText != null && INSTANCE.getConfig().score) {
+//			int scorecolor = INSTANCE.getConfig().scoreColor.getRGB();
+//			drawCenteredText(matrices, this.textRenderer, this.scoreText, this.width / 2, 100, scorecolor);
+//		}
 
 		//Death coords text renderer
 		if(this.deathCoords != null && INSTANCE.getConfig().showCoords) {

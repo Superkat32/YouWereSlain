@@ -29,6 +29,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean fadeInDeathReason = true;
     @ConfigEntry public boolean score = false;
     @ConfigEntry public Color scoreColor = new Color(101, 255, 95);
+    @ConfigEntry public boolean fadeInScore = false;
     @ConfigEntry public boolean respawnButton = false;
     @ConfigEntry public boolean titleScreenButton = false;
     @ConfigEntry public boolean showCoords = false;
@@ -132,6 +133,16 @@ public class YouWereSlainConfig {
                     )
                     .controller(ColorController::new)
                     .build();
+            var fadeInScore = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.score.fadein"))
+                    .tooltip(Text.translatable("youwereslain.score.fadein.tooltip"))
+                    .binding(
+                            defaults.fadeInScore,
+                            () -> config.fadeInScore,
+                            val -> config.fadeInScore = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             textGroup.option(deathMessage);
             textGroup.option(deathMessageColor);
             textGroup.option(fadeInDeathMessage);
@@ -140,6 +151,7 @@ public class YouWereSlainConfig {
             textGroup.option(fadeInDeathReason);
             textGroup.option(score);
             textGroup.option(scoreColor);
+            textGroup.option(fadeInScore);
 
             var buttonsGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("youwereslain.buttons.group"))
