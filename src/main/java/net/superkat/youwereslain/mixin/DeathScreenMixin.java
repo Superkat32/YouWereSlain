@@ -1,6 +1,8 @@
 package net.superkat.youwereslain.mixin;
 
 import com.google.common.collect.Lists;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.*;
 import net.minecraft.client.gui.screen.option.MouseOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -20,6 +22,7 @@ import java.util.List;
 import static net.superkat.youwereslain.YouWereSlainConfig.INSTANCE;
 import static net.superkat.youwereslain.YouWereSlainMain.LOGGER;
 
+@Environment(EnvType.CLIENT)
 @Mixin(DeathScreen.class)
 public abstract class DeathScreenMixin extends Screen {
 	//Welcome to the most spaghetti of spaghetti code there is
@@ -41,8 +44,8 @@ public abstract class DeathScreenMixin extends Screen {
 	//FIXME - FIXED - Respawn buttons are technically still working, but invisible outside of dev env
 	//FIXME - FIXED - Death reason is null (WHYYYYYYY)
 	//FIXME - FIXED - Respawn buttons don't grey out
-	//FIXME - HUD doesn't always become unhidden when it should
-	//FIXME - HUD doesn't unhide if the respawn button from the confirm title screen button screen was used
+	//FIXME - FIXED - HUD doesn't unhide if the respawn button from the confirm title screen button screen was used
+	//FIXME - FIXED(HOPEFULLY) - HUD doesn't always become unhidden when it should
     //random comment to hopefully fix Git being weird
 	public boolean showRespawnButton = INSTANCE.getConfig().respawnButton;
 	public boolean showTitleScreenButton = INSTANCE.getConfig().titleScreenButton;
@@ -55,8 +58,8 @@ public abstract class DeathScreenMixin extends Screen {
 	public int secondsUntilRespawn;
 	public int respawnDelayTicks = INSTANCE.getConfig().respawnDelay * 20;
 	public int ticksToSeconds;
-	private Text message; //The player's death message
-	public boolean isHardcore;
+	private Text deathReasonMessage; //The player's death message
+	private boolean hardcore;
 	private Text scoreText;
 	private Text respawnText = Text.of("0");
 	private Text deathCoords;
@@ -64,15 +67,14 @@ public abstract class DeathScreenMixin extends Screen {
 	public boolean wasHudHidden;
 	public boolean hudWasHiddenByMod;
 	private final List<ButtonWidget> buttons = Lists.newArrayList();
-
 	public DeathScreenMixin() {
 		super(Text.of(""));
 	}
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void onInit(Text message, boolean isHardcore, CallbackInfo ci) {
-        this.message = message;
-        this.isHardcore = isHardcore;
+	@Inject(method = "<init>", at = @At("RETURN"))
+	private void onInit(Text message, boolean isHardcore, CallbackInfo ci) {
+        this.deathReasonMessage = message;
+		this.hardcore = isHardcore;
     }
 
 	@Inject(method = "init", at = @At("RETURN"))
@@ -88,25 +90,28 @@ public abstract class DeathScreenMixin extends Screen {
 		if(showRespawnButton || showTitleScreenButton) {
 			//Respawn or spectate button
 			if(showRespawnButton) {
-				this.buttons.add(this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, this.isHardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), button -> {
+				this.buttons.add(this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, this.hardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), button -> {
+					this.client.player.requestRespawn();
+					this.client.setScreen(null);
 					if(!wasHudHidden && hudWasHiddenByMod) {
 						this.client.options.hudHidden = false;
 					}
-					this.client.player.requestRespawn();
-					this.client.setScreen(null);
 				})));
 			}
 
 			//Exit game button
 			if(showTitleScreenButton) {
 				this.buttons.add(this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 96, 200, 20, Text.translatable("deathScreen.titleScreen"), button -> {
-					if (this.isHardcore) {
+					if (this.hardcore) {
 						this.quitLevel();
 						return;
 					}
 					ConfirmScreen confirmScreen = new ConfirmScreen(this::onConfirmQuit, Text.translatable("deathScreen.quit.confirm"), ScreenTexts.EMPTY, Text.translatable("deathScreen.titleScreen"), Text.translatable("deathScreen.respawn"));
 					this.client.setScreen(confirmScreen);
 					confirmScreen.disableButtons(20);
+					if(!wasHudHidden && hudWasHiddenByMod) {
+						this.client.options.hudHidden = false;
+					}
 				})));
 			}
 			for (ButtonWidget buttonWidget : this.buttons) {
@@ -174,9 +179,9 @@ public abstract class DeathScreenMixin extends Screen {
 		}
 
 		//Death message text renderer
-		if (this.message != null && INSTANCE.getConfig().deathReason) {
+		if (this.deathReasonMessage != null && INSTANCE.getConfig().deathReason) {
             int deathreasoncolor = INSTANCE.getConfig().deathReasonColor.getRGB();
-			drawCenteredText(matrices, this.textRenderer, this.message, this.width / 2, 85, deathreasoncolor);
+			drawCenteredText(matrices, this.textRenderer, this.deathReasonMessage, this.width / 2, 85, deathreasoncolor);
 		}
 
 		//Score text renderer
@@ -197,7 +202,7 @@ public abstract class DeathScreenMixin extends Screen {
 
 		//Button stuff
 		if(showRespawnButton || showTitleScreenButton) {
-			if (this.message != null && mouseY > 85 && mouseY < 85 + this.textRenderer.fontHeight) {
+			if (this.deathReasonMessage != null && mouseY > 85 && mouseY < 85 + this.textRenderer.fontHeight) {
 				Style style = this.getTextComponentUnderMouse(mouseX);
 				this.renderTextHoverEffect(matrices, style, mouseX, mouseY);
 			}
@@ -219,16 +224,16 @@ public abstract class DeathScreenMixin extends Screen {
 
 	@Nullable
 	private Style getTextComponentUnderMouse(int mouseX) {
-		if (this.message == null) {
+		if (this.deathReasonMessage == null) {
 			return null;
 		}
-		int i = this.client.textRenderer.getWidth(this.message);
+		int i = this.client.textRenderer.getWidth(this.deathReasonMessage);
 		int j = this.width / 2 - i / 2;
 		int k = this.width / 2 + i / 2;
 		if (mouseX < j || mouseX > k) {
 			return null;
 		}
-		return this.client.textRenderer.getTextHandler().getStyleAt(this.message, mouseX - j);
+		return this.client.textRenderer.getTextHandler().getStyleAt(this.deathReasonMessage, mouseX - j);
 	}
 
 	@Inject(method = "tick", at = @At("HEAD"), cancellable = true)
@@ -269,12 +274,12 @@ public abstract class DeathScreenMixin extends Screen {
 				showRespawnButton = true;
 				overrideButtonOptions = false;
 				shiftIsHeldDown = false;
-				this.buttons.add(this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, this.isHardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), button -> {
-					if(!wasHudHidden && hudWasHiddenByMod) {
-						this.client.options.hudHidden = false;
-					}
+				this.buttons.add(this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, this.hardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), button -> {
 					this.client.player.requestRespawn();
 					this.client.setScreen(null);
+					if(hudWasHiddenByMod) {
+						this.client.options.hudHidden = false;
+					}
 				})));
 			} else if(MouseOptionsScreen.hasShiftDown() && overrideButtonOptions) {
 				ticksSinceShiftPress++;
