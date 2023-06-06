@@ -26,6 +26,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean fadeInDeathMessage = true;
     @ConfigEntry public boolean deathReason = false;
     @ConfigEntry public Color deathReasonColor = Color.WHITE;
+    @ConfigEntry public boolean fadeInDeathReason = true;
     @ConfigEntry public boolean score = false;
     @ConfigEntry public Color scoreColor = new Color(101, 255, 95);
     @ConfigEntry public boolean respawnButton = false;
@@ -43,7 +44,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public Color respawnMessageColor = new Color(240, 130, 132);
     @ConfigEntry public boolean shiftOverridesDelay = false;
     @ConfigEntry public String emergencyRespawnMessage = "Emergency respawn button activating in <time> seconds";
-    @ConfigEntry public boolean disableHud = true;
+    @ConfigEntry public boolean disableHud = false;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -102,6 +103,16 @@ public class YouWereSlainConfig {
                     )
                     .controller(ColorController::new)
                     .build();
+            var fadeInDeathReason = Option.createBuilder(Boolean.class)
+                    .name(Text.translatable("youwereslain.deathreason.fadein"))
+                    .tooltip(Text.translatable("youwereslain.deathreason.fadein.tooltip"))
+                    .binding(
+                            defaults.fadeInDeathReason,
+                            () -> config.fadeInDeathReason,
+                            val -> config.fadeInDeathReason = val
+                    )
+                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             var score = Option.createBuilder(Boolean.class)
                     .name(Text.translatable("youwereslain.score"))
                     .tooltip(Text.translatable("youwereslain.score.tooltip"))
@@ -126,6 +137,7 @@ public class YouWereSlainConfig {
             textGroup.option(fadeInDeathMessage);
             textGroup.option(deathReason);
             textGroup.option(deathReasonColor);
+            textGroup.option(fadeInDeathReason);
             textGroup.option(score);
             textGroup.option(scoreColor);
 
