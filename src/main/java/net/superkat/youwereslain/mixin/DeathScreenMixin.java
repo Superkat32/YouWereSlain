@@ -40,8 +40,10 @@ public abstract class DeathScreenMixin extends Screen {
 	//FIXME - FIXED - Respawn buttons stay greyed out outside of dev env (try overriding or mixing into the button style method ?)
 	//FIXME - FIXED - Respawn buttons are technically still working, but invisible outside of dev env
 	//FIXME - FIXED - Death reason is null (WHYYYYYYY)
-	//FIXME - Respawn buttons don't grey out
+	//FIXME - FIXED - Respawn buttons don't grey out
 	//FIXME - HUD doesn't always become unhidden when it should
+	//FIXME - HUD doesn't unhide if the respawn button from the confirm title screen button screen was used
+    //random comment to hopefully fix Git being weird
 	public boolean showRespawnButton = INSTANCE.getConfig().respawnButton;
 	public boolean showTitleScreenButton = INSTANCE.getConfig().titleScreenButton;
 	public boolean overrideButtonOptions = true;
@@ -284,11 +286,12 @@ public abstract class DeathScreenMixin extends Screen {
 		}
 
 		//Respawning
-		if(ticksUntilRespawn == respawnDelayTicks - 20 && showRespawnButton || showTitleScreenButton) {
+		if(ticksSinceDeath == 20) {
 			for (ButtonWidget buttonWidget : this.buttons) {
 				buttonWidget.active = true;
 			}
 		}
+		LOGGER.info(String.valueOf(ticksSinceDeath));
 		if (this.ticksUntilRespawn == 0) {
 			if(!wasHudHidden && hudWasHiddenByMod) {
 				this.client.options.hudHidden = false;
