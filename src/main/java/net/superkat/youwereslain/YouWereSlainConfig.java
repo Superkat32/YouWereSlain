@@ -47,6 +47,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean shiftOverridesDelay = false;
     @ConfigEntry public String emergencyRespawnMessage = "Emergency respawn button activating in <time> seconds";
     @ConfigEntry public boolean disableHud = false;
+    @ConfigEntry public boolean modEnabled = true;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -407,9 +408,37 @@ public class YouWereSlainConfig {
             defaultCategoryBuilder.group(coordGroup.build());
             defaultCategoryBuilder.group(gradientGroup.build());
             defaultCategoryBuilder.group(respawnGroup.build());
+
+
+
+            var extrasCategoryBuilder = ConfigCategory.createBuilder()
+                    .name(Text.translatable("youwereslain.category.extra"));
+
+            var extrasGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("youwereslain.extra.group"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.extra.group.tooltip"))
+                            .build());
+
+            var modEnabled = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("youwereslain.enabled"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.enabled.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.modEnabled,
+                            () -> config.modEnabled,
+                            val -> config.modEnabled = val
+                    )
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
+            extrasGroup.option(modEnabled);
+            extrasCategoryBuilder.group(extrasGroup.build());
+
             return builder
                     .title(Text.translatable("youwereslain.title"))
-                    .category(defaultCategoryBuilder.build());
+                    .category(defaultCategoryBuilder.build())
+                    .category(extrasCategoryBuilder.build());
         }).generateScreen(parent);
     }
 
