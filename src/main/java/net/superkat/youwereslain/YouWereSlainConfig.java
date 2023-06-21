@@ -1,16 +1,13 @@
 package net.superkat.youwereslain;
 
-import dev.isxander.yacl.api.ConfigCategory;
-import dev.isxander.yacl.api.Option;
-import dev.isxander.yacl.api.OptionGroup;
-import dev.isxander.yacl.api.YetAnotherConfigLib;
-import dev.isxander.yacl.config.ConfigEntry;
-import dev.isxander.yacl.config.ConfigInstance;
-import dev.isxander.yacl.config.GsonConfigInstance;
-import dev.isxander.yacl.gui.controllers.BooleanController;
-import dev.isxander.yacl.gui.controllers.ColorController;
-import dev.isxander.yacl.gui.controllers.slider.IntegerSliderController;
-import dev.isxander.yacl.gui.controllers.string.StringController;
+import dev.isxander.yacl3.api.*;
+import dev.isxander.yacl3.api.controller.ColorControllerBuilder;
+import dev.isxander.yacl3.api.controller.StringControllerBuilder;
+import dev.isxander.yacl3.config.ConfigEntry;
+import dev.isxander.yacl3.config.GsonConfigInstance;
+import dev.isxander.yacl3.gui.controllers.BooleanController;
+import dev.isxander.yacl3.gui.controllers.ColorController;
+import dev.isxander.yacl3.gui.controllers.slider.IntegerSliderController;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
@@ -19,9 +16,12 @@ import java.nio.file.Path;
 
 public class YouWereSlainConfig {
 
-    public static final ConfigInstance<YouWereSlainConfig> INSTANCE = new GsonConfigInstance<>(YouWereSlainConfig.class, Path.of("./config/youwereslain.json"));
+//    public static final ConfigInstance<YouWereSlainConfig> INSTANCE = new GsonConfigInstance<>(YouWereSlainConfig.class, Path.of("./config/youwereslain.json"));
+    public static final GsonConfigInstance<YouWereSlainConfig> INSTANCE = GsonConfigInstance.<YouWereSlainConfig>createBuilder(YouWereSlainConfig.class)
+        .setPath(Path.of("./config/youwereslain.json")).build();
 
-    @ConfigEntry public String deathMessage = "You were slain...";
+    @ConfigEntry
+    public String deathMessage = "You were slain...";
     @ConfigEntry public Color deathMessageColor = new Color(240, 130, 132);
     @ConfigEntry public boolean fadeInDeathMessage = true;
     @ConfigEntry public boolean deathReason = false;
@@ -55,94 +55,108 @@ public class YouWereSlainConfig {
 
             var textGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("youwereslain.text.group"))
-                    .tooltip(Text.translatable("youwereslain.text.group.tooltip"));
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.text.group.tooltip"))
+                            .build());
 
-            var deathMessage = Option.createBuilder(String.class)
+            var deathMessage = Option.<String>createBuilder()
                     .name(Text.translatable("youwereslain.deathmessage"))
-                    .tooltip(Text.translatable("youwereslain.deathmessage.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.deathmessage.tooltip"))
+                            .build())
                     .binding(
                         defaults.deathMessage,
                         () -> config.deathMessage,
                         val -> config.deathMessage = val
                     )
-                    .controller(StringController::new)
+                    .controller(StringControllerBuilder::create)
                     .build();
-            var deathMessageColor = Option.createBuilder(Color.class)
+            var deathMessageColor = Option.<Color>createBuilder()
                     .name(Text.translatable("youwereslain.deathmessage.color"))
                     .binding(
                             defaults.deathMessageColor,
                             () -> config.deathMessageColor,
                             val -> config.deathMessageColor = val
                     )
-                    .controller(ColorController::new)
+                    .controller(ColorControllerBuilder::create)
                     .build();
-            var fadeInDeathMessage = Option.createBuilder(Boolean.class)
+            var fadeInDeathMessage = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.deathmessage.fadein"))
-                    .tooltip(Text.translatable("youwereslain.deathmessage.fadein.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.deathmessage.fadein.tooltip"))
+                            .build())
                     .binding(
                             defaults.fadeInDeathMessage,
                             () -> config.fadeInDeathMessage,
                             val -> config.fadeInDeathMessage = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
-            var deathReason = Option.createBuilder(Boolean.class)
+            var deathReason = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.deathreason"))
-                    .tooltip(Text.translatable("youwereslain.deathreason.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.deathreason.tooltip"))
+                            .build())
                     .binding(
                             defaults.deathReason,
                             () -> config.deathReason,
                             val -> config.deathReason = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
-            var deathReasonColor = Option.createBuilder(Color.class)
+            var deathReasonColor = Option.<Color>createBuilder()
                     .name(Text.translatable("youwereslain.deathreason.color"))
                     .binding(
                             defaults.deathReasonColor,
                             () -> config.deathReasonColor,
                             val -> config.deathReasonColor = val
                     )
-                    .controller(ColorController::new)
+                    .controller(ColorControllerBuilder::create)
                     .build();
-            var fadeInDeathReason = Option.createBuilder(Boolean.class)
+            var fadeInDeathReason = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.deathreason.fadein"))
-                    .tooltip(Text.translatable("youwereslain.deathreason.fadein.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.deathreason.fadein.tooltip"))
+                            .build())
                     .binding(
                             defaults.fadeInDeathReason,
                             () -> config.fadeInDeathReason,
                             val -> config.fadeInDeathReason = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
-            var score = Option.createBuilder(Boolean.class)
+            var score = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.score"))
-                    .tooltip(Text.translatable("youwereslain.score.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.score.tooltip"))
+                            .build())
                     .binding(
                             defaults.score,
                             () -> config.score,
                             val -> config.score = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
-            var scoreColor = Option.createBuilder(Color.class)
+            var scoreColor = Option.<Color>createBuilder()
                     .name(Text.translatable("youwereslain.score.color"))
                     .binding(
                             defaults.scoreColor,
                             () -> config.scoreColor,
                             val -> config.scoreColor = val
                     )
-                    .controller(ColorController::new)
+                    .controller(ColorControllerBuilder::create)
                     .build();
-            var fadeInScore = Option.createBuilder(Boolean.class)
+            var fadeInScore = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.score.fadein"))
-                    .tooltip(Text.translatable("youwereslain.score.fadein.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.score.fadein.tooltip"))
+                            .build())
                     .binding(
                             defaults.fadeInScore,
                             () -> config.fadeInScore,
                             val -> config.fadeInScore = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
             textGroup.option(deathMessage);
             textGroup.option(deathMessageColor);
@@ -156,61 +170,73 @@ public class YouWereSlainConfig {
 
             var buttonsGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("youwereslain.buttons.group"))
-                    .tooltip(Text.translatable("youwereslain.buttons.group.tooltip"));
-            var respawnButton = Option.createBuilder(Boolean.class)
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.buttons.group.tooltip"))
+                            .build());
+            var respawnButton = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.button.respawn"))
-                    .tooltip(Text.translatable("youwereslain.button.respawn.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.button.respawn.tooltip"))
+                            .build())
                     .binding(
                             defaults.respawnButton,
                             () -> config.respawnButton,
                             val -> config.respawnButton = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
-            var titleScreenButton = Option.createBuilder(Boolean.class)
+            var titleScreenButton = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.button.title"))
-                    .tooltip(Text.translatable("youwereslain.button.title.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.button.title.tooltip"))
+                            .build())
                     .binding(
                             defaults.titleScreenButton,
                             () -> config.titleScreenButton,
                             val -> config.titleScreenButton = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
             buttonsGroup.option(respawnButton);
             buttonsGroup.option(titleScreenButton);
 
             var coordGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("youwereslain.coord.group"))
-                    .tooltip(Text.translatable("youwereslain.coord.group.tooltip"));
-            var showCoords = Option.createBuilder(Boolean.class)
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.coord.group.tooltip"))
+                            .build());
+            var showCoords = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.showcoords"))
-                    .tooltip(Text.translatable("youwereslain.showcoords.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.showcoords.tooltip"))
+                            .build())
                     .binding(
                             defaults.showCoords,
                             () -> config.showCoords,
                             val -> config.showCoords = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
-            var coordsColors = Option.createBuilder(Color.class)
+            var coordsColors = Option.<Color>createBuilder()
                     .name(Text.translatable("youwereslain.showcoords.color"))
                     .binding(
                             defaults.coordsColor,
                             () -> config.coordsColor,
                             val -> config.coordsColor = val
                     )
-                    .controller(ColorController::new)
+                    .controller(ColorControllerBuilder::create)
                     .build();
-            var sendCoordsInChat = Option.createBuilder(Boolean.class)
+            var sendCoordsInChat = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.chatcoords"))
-                    .tooltip(Text.translatable("youwereslain.chatcoords.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.chatcoords.tooltip"))
+                            .build())
                     .binding(
                             defaults.sendCoordsInChat,
                             () -> config.sendCoordsInChat,
                             val -> config.sendCoordsInChat = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
             coordGroup.option(showCoords);
             coordGroup.option(coordsColors);
@@ -218,34 +244,38 @@ public class YouWereSlainConfig {
 
             var gradientGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("youwereslain.gradient.group"))
-                    .tooltip(Text.translatable("youwereslain.gradient.group.tooltip"));
-            var useGradients = Option.createBuilder(Boolean.class)
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.gradient.group.tooltip"))
+                            .build());
+            var useGradients = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.gradient"))
-                    .tooltip(Text.translatable("youwereslain.gradient.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.gradient.tooltip"))
+                            .build())
                     .binding(
                             defaults.useCustomGradients,
                             () -> config.useCustomGradients,
                             val -> config.useCustomGradients = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
-            var gradientStart = Option.createBuilder(Color.class)
+            var gradientStart = Option.<Color>createBuilder()
                     .name(Text.translatable("youwereslain.gradientstart.color"))
                     .binding(
                             defaults.gradientStart,
                             () -> config.gradientStart,
                             val -> config.gradientStart = val
                     )
-                    .controller(opt -> new ColorController(opt, true))
+                    .customController(opt -> new ColorController(opt, true))
                     .build();
-            var gradientEnd = Option.createBuilder(Color.class)
+            var gradientEnd = Option.<Color>createBuilder()
                     .name(Text.translatable("youwereslain.gradientend.color"))
                     .binding(
                             defaults.gradientEnd,
                             () -> config.gradientEnd,
                             val -> config.gradientEnd = val
                     )
-                    .controller(opt -> new ColorController(opt, true))
+                    .customController(opt -> new ColorController(opt, true))
                     .build();
             gradientGroup.option(useGradients);
             gradientGroup.option(gradientStart);
@@ -253,96 +283,114 @@ public class YouWereSlainConfig {
 
             var respawnGroup = OptionGroup.createBuilder()
                     .name(Text.translatable("youwereslain.respawn.group"))
-                    .tooltip(Text.translatable("youwereslain.respawn.group.tooltip"));
-            var shouldRespawnDelay = Option.createBuilder(Boolean.class)
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.respawn.group.tooltip"))
+                            .build());
+            var shouldRespawnDelay = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.respawndelay"))
-                    .tooltip(Text.translatable("youwereslain.respawndelay.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.respawndelay.tooltip"))
+                            .build())
                     .binding(
                             defaults.shouldRespawnDelay,
                             () -> config.shouldRespawnDelay,
                             val -> config.shouldRespawnDelay = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
-            var respawnDelayText = Option.createBuilder(Boolean.class)
+        var respawnDelayText = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.timer"))
-                    .tooltip(Text.translatable("youwereslain.timer.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.timer.tooltip"))
+                            .build())
                     .binding(
                             defaults.respawnTimer,
                             () -> config.respawnTimer,
                             val -> config.respawnTimer = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
-            var respawnDelay = Option.createBuilder(Integer.class)
+            var respawnDelay = Option.<Integer>createBuilder()
                     .name(Text.translatable("youwereslain.delay"))
-                    .tooltip(Text.translatable("youwereslain.delay.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.delay.tooltip"))
+                            .build())
                     .binding(
                             defaults.respawnDelay,
                             () -> config.respawnDelay,
                             val -> config.respawnDelay = val
                     )
-                    .controller(opt -> new <Integer>IntegerSliderController(opt, 1, 100, 1))
+                    .customController(opt -> new <Integer>IntegerSliderController(opt, 1, 100, 1))
                     .build();
-            var respawningMessage = Option.createBuilder(String.class)
+            var respawningMessage = Option.<String>createBuilder()
                     .name(Text.translatable("youwereslain.respawnmessage"))
-                    .tooltip(Text.translatable("youwereslain.respawnmessage.tooltip"))
-                    .tooltip(Text.translatable("youwereslain.respawnmessage.tooltip.time"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.respawnmessage.tooltip"))
+                            .text(Text.translatable("youwereslain.respawnmessage.tooltip.time"))
+                            .build())
                     .binding(
                             defaults.respawningMessage,
                             () -> config.respawningMessage,
                             val -> config.respawningMessage = val
                     )
-                    .controller(StringController::new)
+                    .controller(StringControllerBuilder::create)
                     .build();
-            var respawnMessageColor = Option.createBuilder(Color.class)
+            var respawnMessageColor = Option.<Color>createBuilder()
                     .name(Text.translatable("youwereslain.respawnmessage.color"))
                     .binding(
                             defaults.respawnMessageColor,
                             () -> config.respawnMessageColor,
                             val -> config.respawnMessageColor = val
                     )
-                    .controller(ColorController::new)
+                    .controller(ColorControllerBuilder::create)
                     .build();
-            var fadeInRespawnMessage = Option.createBuilder(Boolean.class)
+            var fadeInRespawnMessage = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.respawnmessage.fadein"))
-                    .tooltip(Text.translatable("youwereslain.respawnmessage.fadeintooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.respawnmessage.fadeintooltip"))
+                            .build())
                     .binding(
                             defaults.fadeInRespawnMessage,
                             () -> config.fadeInRespawnMessage,
                             val -> config.fadeInRespawnMessage = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
-            var shiftOverridesDelay = Option.createBuilder(Boolean.class)
+            var shiftOverridesDelay = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.delayoverride"))
-                    .tooltip(Text.translatable("youwereslain.delayoverride.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.delayoverride.tooltip"))
+                            .build())
                     .binding(
                             defaults.shiftOverridesDelay,
                             () -> config.shiftOverridesDelay,
                             val -> config.shiftOverridesDelay = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
-            var emergencyRespawnMessage = Option.createBuilder(String.class)
+            var emergencyRespawnMessage = Option.<String>createBuilder()
                     .name(Text.translatable("youwereslain.emergencyrespawn"))
-                    .tooltip(Text.translatable("youwereslain.emergencyrespawn.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.emergencyrespawn.tooltip"))
+                            .build())
                     .binding(
                             defaults.emergencyRespawnMessage,
                             () -> config.emergencyRespawnMessage,
                             val -> config.emergencyRespawnMessage = val
                     )
-                    .controller(StringController::new)
+                    .controller(StringControllerBuilder::create)
                     .build();
-            var disableHud = Option.createBuilder(Boolean.class)
+            var disableHud = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.hud"))
-                    .tooltip(Text.translatable("youwereslain.hud.tooltip"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.hud.tooltip"))
+                            .build())
                     .binding(
                             defaults.disableHud,
                             () -> config.disableHud,
                             val -> config.disableHud = val
                     )
-                    .controller(booleanOption -> new BooleanController(booleanOption, true))
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
             respawnGroup.option(shouldRespawnDelay);
             respawnGroup.option(respawnDelayText);
