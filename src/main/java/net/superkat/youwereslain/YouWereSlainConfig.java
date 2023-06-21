@@ -24,8 +24,8 @@ public class YouWereSlainConfig {
     public String deathMessage = "You were slain...";
     @ConfigEntry public Color deathMessageColor = new Color(240, 130, 132);
     @ConfigEntry public boolean fadeInDeathMessage = true;
-    @ConfigEntry public boolean deathReason = false;
-    @ConfigEntry public Color deathReasonColor = Color.WHITE;
+    @ConfigEntry public boolean deathReason = true;
+    @ConfigEntry public Color deathReasonColor = new Color(240, 159, 161);
     @ConfigEntry public boolean fadeInDeathReason = true;
     @ConfigEntry public boolean score = false;
     @ConfigEntry public Color scoreColor = new Color(101, 255, 95);
@@ -347,7 +347,7 @@ public class YouWereSlainConfig {
             var fadeInRespawnMessage = Option.<Boolean>createBuilder()
                     .name(Text.translatable("youwereslain.respawnmessage.fadein"))
                     .description(OptionDescription.createBuilder()
-                            .text(Text.translatable("youwereslain.respawnmessage.fadeintooltip"))
+                            .text(Text.translatable("youwereslain.respawnmessage.fadein.tooltip"))
                             .build())
                     .binding(
                             defaults.fadeInRespawnMessage,
