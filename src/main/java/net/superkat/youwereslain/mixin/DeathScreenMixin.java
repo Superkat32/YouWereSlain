@@ -69,7 +69,6 @@ public abstract class DeathScreenMixin extends Screen {
 	public boolean wasHudHidden;
 	public boolean hudWasHiddenByMod;
 	private final List<ButtonWidget> buttons = Lists.newArrayList();
-//	private ButtonWidget buttons;
 	public DeathScreenMixin() {
 		super(Text.of(""));
 	}
