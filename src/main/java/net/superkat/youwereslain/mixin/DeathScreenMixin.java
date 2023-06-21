@@ -13,6 +13,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -37,6 +38,8 @@ public abstract class DeathScreenMixin extends Screen {
 
 	//KNOWN INCOMPATIBILITIES
 	//Respawn Delay(turns the player into a spectator instead of seeing the death screen upon death)
+
+	@Shadow protected abstract void setButtonsActive(boolean active);
 
 	public boolean showRespawnButton = INSTANCE.getConfig().respawnButton;
 	public boolean showTitleScreenButton = INSTANCE.getConfig().titleScreenButton;
@@ -79,13 +82,6 @@ public abstract class DeathScreenMixin extends Screen {
 			ticksSinceShiftPress = 0;
 			wasHudHidden = this.client.options.hudHidden;
 
-			//Reset to default Minecraft death screen
-	//		if(!modEnabled) {
-	//			showRespawnButton = true;
-	//			showTitleScreenButton = true;
-	//			overrideButtonOptions = false;
-	//		}
-
 			//Prevent softlock with config options
 			if(!showRespawnButton && !INSTANCE.getConfig().shouldRespawnDelay) {
 				showRespawnButton = true;
@@ -117,6 +113,7 @@ public abstract class DeathScreenMixin extends Screen {
 						}
 					}).dimensions(this.width / 2 - 100, this.height / 4 + 96, 200, 20).build()));
 				}
+				this.setButtonsActive(false);
 			}
 
 			//Score and death coords
@@ -291,18 +288,13 @@ public abstract class DeathScreenMixin extends Screen {
 			//Respawning message
 			this.respawnText = Text.of(respawnMessage.replaceAll("<time>", String.valueOf(secondsUntilRespawn)));
 
-			//Hud disabling
+			//HUD disabling
 			if(ticksUntilRespawn == respawnDelayTicks - 1 && INSTANCE.getConfig().disableHud) {
 				if(!wasHudHidden) {
 					this.client.options.hudHidden = true;
 					hudWasHiddenByMod = true;
 				}
 			}
-
-			//Chat death coords message
-	//		if(ticksUntilRespawn == respawnDelayTicks - 1 && INSTANCE.getConfig().sendCoordsInChat) {
-	//			this.client.player.sendMessage(Text.literal(deathCoordsMessage).formatted(Formatting.RED));
-	//		}
 
 			//Second counter
 			if(ticksToSeconds == 20) {
@@ -316,14 +308,6 @@ public abstract class DeathScreenMixin extends Screen {
 					showRespawnButton = true;
 					overrideButtonOptions = false;
 					shiftIsHeldDown = false;
-	//				this.buttons.add(this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 72, 200, 20, this.hardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), button -> {
-	//					this.client.player.requestRespawn();
-	//					this.client.setScreen(null);
-	//					if(hudWasHiddenByMod) {
-	//						this.client.options.hudHidden = false;
-	//					}
-	//					sendDeathCoords();
-	//				})));
 					this.buttons.add((ButtonWidget)this.addDrawableChild(ButtonWidget.builder(this.hardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), (button) -> {
 						this.client.player.requestRespawn();
 						this.client.setScreen(null);
@@ -344,9 +328,7 @@ public abstract class DeathScreenMixin extends Screen {
 
 			//Respawning
 			if(ticksSinceDeath == 20) {
-				for (ButtonWidget buttonWidget : this.buttons) {
-					buttonWidget.active = true;
-				}
+				this.setButtonsActive(true);
 			}
 			if (this.ticksUntilRespawn == 0 && INSTANCE.getConfig().shouldRespawnDelay) {
 				this.client.player.requestRespawn();
