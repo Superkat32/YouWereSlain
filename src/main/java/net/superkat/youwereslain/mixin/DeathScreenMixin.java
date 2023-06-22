@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.awt.*;
 import java.util.List;
 
 import static net.superkat.youwereslain.YouWereSlainConfig.INSTANCE;
@@ -41,6 +42,7 @@ public abstract class DeathScreenMixin extends Screen {
 
 	@Shadow protected abstract void setButtonsActive(boolean active);
 
+	@Shadow @Nullable private ButtonWidget titleScreenButton;
 	public boolean showRespawnButton = INSTANCE.getConfig().respawnButton;
 	public boolean showTitleScreenButton = INSTANCE.getConfig().titleScreenButton;
 	public boolean overrideButtonOptions = true;
@@ -62,6 +64,7 @@ public abstract class DeathScreenMixin extends Screen {
 	public boolean hudWasHiddenByMod;
 	private final List<ButtonWidget> buttons = Lists.newArrayList();
 	public boolean modEnabled = INSTANCE.getConfig().modEnabled;
+	public boolean softlockWasPrevented = false;
 	public DeathScreenMixin() {
 		super(Text.of(""));
 	}
@@ -83,8 +86,9 @@ public abstract class DeathScreenMixin extends Screen {
 			wasHudHidden = this.client.options.hudHidden;
 
 			//Prevent softlock with config options
-			if(!showRespawnButton && !INSTANCE.getConfig().shouldRespawnDelay) {
+			if(!showRespawnButton && !showTitleScreenButton && !INSTANCE.getConfig().shouldRespawnDelay) {
 				showRespawnButton = true;
+				softlockWasPrevented = true;
 				LOGGER.warn("Possible softlock prevented");
 				LOGGER.warn("Respawn button status: " + INSTANCE.getConfig().respawnButton);
 				LOGGER.warn("Respawn delay status: " + INSTANCE.getConfig().shouldRespawnDelay);
@@ -219,6 +223,17 @@ public abstract class DeathScreenMixin extends Screen {
 				int color = INSTANCE.getConfig().scoreColor.getRGB();
 				int fadeColor = (color & 0x00FFFFFF) | ((int)(alpha * 255) << 24);
 				context.drawCenteredTextWithShadow(this.textRenderer, this.scoreText, this.width / 2, 100, INSTANCE.getConfig().fadeInScore ? fadeColor : color);
+			}
+
+			int fadeNoSoftlockText = softlockWasPrevented ? defaultFadeDelay : 0;
+			if(ticksSinceDeath >= fadeNoSoftlockText && softlockWasPrevented) {
+				Text prevented = Text.translatable("youwereslain.nosoftlock.prevented");
+				Text help = Text.translatable("youwereslain.nosoftlock.help");
+				float alpha = (float) Math.min(1.0, (float) ticksSinceDeath / fade);
+				int color = new Color(239, 245, 255, 80).hashCode();
+				int fadeColor = (color & 0x00FFFFFF) | ((int)(alpha * 255) << 24);
+				context.drawCenteredTextWithShadow(this.textRenderer, prevented, this.width / 2, 200, INSTANCE.getConfig().fadeInScore ? fadeColor : color);
+				context.drawCenteredTextWithShadow(this.textRenderer, help, this.width / 2, 210, INSTANCE.getConfig().fadeInScore ? fadeColor : color);
 			}
 
 			//Death coords text renderer

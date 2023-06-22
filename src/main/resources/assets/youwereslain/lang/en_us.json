@@ -62,6 +62,19 @@
   "youwereslain.emergencyrespawn": "Emergency Respawn Message",
   "youwereslain.emergencyrespawn.tooltip": "Text that alerts the user they are about to activate the emergency respawn button",
   "youwereslain.hud": "Hide HUD Upon Death",
-  "youwereslain.hud.tooltip": "If the HUD isn't hidden upon death, this option will hide it until respawning"
+  "youwereslain.hud.tooltip": "If the HUD isn't hidden upon death, this option will hide it until respawning",
+
+
+
+  "youwereslain.category.extra": "Extras",
+
+  "youwereslain.extra.group": "Extra Options",
+  "youwereslain.extra.group.tooltip": "Extra options",
+
+  "youwereslain.enabled": "Mod Enabled",
+  "youwereslain.enabled.tooltip": "If enabled, the death screen will use options from the \"Death Screen\" category. If disabled, the death screen will look like vanilla Minecraft's death screen.",
+
+  "youwereslain.nosoftlock.prevented": "A possible softlock has been prevented",
+  "youwereslain.nosoftlock.help": "Please check your config and enable respawn delay or any button"
 }
 
