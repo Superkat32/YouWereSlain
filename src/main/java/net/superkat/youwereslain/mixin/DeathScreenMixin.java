@@ -174,8 +174,8 @@ public class DeathScreenMixin extends Screen {
 		if(modEnabled) {
 			ci.cancel(); //Done to prevent the default death screen from rendering
 			int defaultFadeDelay = 7;
-			if(!client.isInSingleplayer()) {
-				defaultFadeDelay = 22;
+			if(!client.isInSingleplayer() && INSTANCE.getConfig().fadeInWorkaround) {
+				defaultFadeDelay = 21;
 			}
 			int fade = 50;
 

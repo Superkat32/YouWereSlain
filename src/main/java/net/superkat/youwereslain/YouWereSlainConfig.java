@@ -47,6 +47,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean disableHud = false;
     @ConfigEntry public boolean modEnabled = true;
     @ConfigEntry public boolean showPreventedSoftlockMessage = true;
+    @ConfigEntry public boolean fadeInWorkaround = true;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -443,8 +444,21 @@ public class YouWereSlainConfig {
                     )
                     .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
+            var fadeInWorkaround = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("youwereslain.fadeinworkaround"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.fadeinworkaround.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.fadeInWorkaround,
+                            () -> config.fadeInWorkaround,
+                            val -> config.fadeInWorkaround = val
+                    )
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             extrasGroup.option(modEnabled);
             extrasGroup.option(showPreventedSoftlockMessage);
+            extrasGroup.option(fadeInWorkaround);
             extrasCategoryBuilder.group(extrasGroup.build());
 
             return builder
