@@ -13,12 +13,12 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.awt.*;
+import java.util.Iterator;
 import java.util.List;
 
 import static net.superkat.youwereslain.YouWereSlainConfig.INSTANCE;
@@ -26,7 +26,7 @@ import static net.superkat.youwereslain.YouWereSlainMain.LOGGER;
 
 @Environment(EnvType.CLIENT)
 @Mixin(DeathScreen.class)
-public abstract class DeathScreenMixin extends Screen {
+public class DeathScreenMixin extends Screen {
 	//Welcome to the most spaghetti of spaghetti code there is
 
 	//KNOWN COMPATIBILITIES
@@ -40,9 +40,6 @@ public abstract class DeathScreenMixin extends Screen {
 	//KNOWN INCOMPATIBILITIES
 	//Respawn Delay(turns the player into a spectator instead of seeing the death screen upon death)
 
-	@Shadow protected abstract void setButtonsActive(boolean active);
-
-	@Shadow @Nullable private ButtonWidget titleScreenButton;
 	public boolean showRespawnButton = INSTANCE.getConfig().respawnButton;
 	public boolean showTitleScreenButton = INSTANCE.getConfig().titleScreenButton;
 	public boolean overrideButtonOptions = true;
@@ -138,6 +135,14 @@ public abstract class DeathScreenMixin extends Screen {
 		return false;
 	}
 
+	private void setButtonsActive(boolean active) {
+		ButtonWidget buttonWidget;
+		for(Iterator var2 = this.buttons.iterator(); var2.hasNext(); buttonWidget.active = active) {
+			buttonWidget = (ButtonWidget)var2.next();
+		}
+
+	}
+
 	private void titleScreenWasClicked() {
 		if (this.hardcore) {
 			this.quitLevel();
@@ -169,6 +174,9 @@ public abstract class DeathScreenMixin extends Screen {
 		if(modEnabled) {
 			ci.cancel(); //Done to prevent the default death screen from rendering
 			int defaultFadeDelay = 7;
+			if(!client.isInSingleplayer()) {
+				defaultFadeDelay = 22;
+			}
 			int fade = 50;
 
 			//Death gradient renderer
@@ -297,7 +305,7 @@ public abstract class DeathScreenMixin extends Screen {
 		if(modEnabled) {
 			ci.cancel();
 			//Counting ticks stuff
-			super.tick();
+//			super.tick();
 			++this.ticksSinceDeath;
 			++this.ticksToSeconds;
 			--this.ticksUntilRespawn;
