@@ -99,9 +99,7 @@ public class DeathScreenMixin extends Screen {
 				if(showRespawnButton) {
 					this.buttons.add((ButtonWidget)this.addDrawableChild(ButtonWidget.builder(this.hardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), (button) -> {
 						this.client.player.requestRespawn();
-						if(!wasHudHidden && hudWasHiddenByMod) {
-							this.client.options.hudHidden = false;
-						}
+						unhideHUD();
 						sendDeathCoords();
 						button.active = false;
 					}).dimensions(this.width / 2 - 100, this.height / 4 + 72, 200, 20).build()));
@@ -111,9 +109,7 @@ public class DeathScreenMixin extends Screen {
 				if(showTitleScreenButton) {
 					this.buttons.add((ButtonWidget) this.addDrawableChild(ButtonWidget.builder(Text.translatable("deathScreen.titleScreen"), (button) -> {
 						this.client.getAbuseReportContext().tryShowDraftScreen(this.client, this, this::titleScreenWasClicked, true);
-						if(!wasHudHidden && hudWasHiddenByMod) {
-							this.client.options.hudHidden = false;
-						}
+						unhideHUD();
 					}).dimensions(this.width / 2 - 100, this.height / 4 + 96, 200, 20).build()));
 				}
 				this.setButtonsActive(false);
@@ -167,6 +163,14 @@ public class DeathScreenMixin extends Screen {
 		}
 		this.client.disconnect(new MessageScreen(Text.translatable("menu.savingLevel")));
 		this.client.setScreen(new TitleScreen());
+	}
+
+	private void unhideHUD() {
+        LOGGER.info("wasHudHidden: " + wasHudHidden);
+        LOGGER.info("hudwasHiddenByMod: " + hudWasHiddenByMod);
+		if(!wasHudHidden && hudWasHiddenByMod) {
+			this.client.options.hudHidden = false;
+		}
 	}
 
 	@Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -336,9 +340,7 @@ public class DeathScreenMixin extends Screen {
 					this.buttons.add((ButtonWidget)this.addDrawableChild(ButtonWidget.builder(this.hardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), (button) -> {
 						this.client.player.requestRespawn();
 						this.client.setScreen(null);
-						if(hudWasHiddenByMod) {
-							this.client.options.hudHidden = false;
-						}
+						unhideHUD();
 						sendDeathCoords();
 						button.active = false;
 					}).dimensions(this.width / 2 - 100, this.height / 4 + 72, 200, 20).build()));
@@ -357,9 +359,7 @@ public class DeathScreenMixin extends Screen {
 			}
 			if (this.ticksUntilRespawn == 0 && INSTANCE.getConfig().shouldRespawnDelay) {
 				this.client.player.requestRespawn();
-				if(!wasHudHidden && hudWasHiddenByMod) {
-					this.client.options.hudHidden = false;
-				}
+				unhideHUD();
 				sendDeathCoords();
 			}
 		} else {
