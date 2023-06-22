@@ -75,9 +75,10 @@ public abstract class DeathScreenMixin extends Screen {
 		this.hardcore = isHardcore;
     }
 
-	@Inject(method = "init", at = @At("RETURN"))
-	private void init(CallbackInfo callbackInfo) {
+	@Inject(method = "init", at = @At("HEAD"), cancellable = true)
+	private void init(CallbackInfo ci) {
 		if(modEnabled) {
+			ci.cancel();
 			ticksSinceDeath = 0;
 			ticksUntilRespawn = respawnDelayTicks;
 			secondsUntilRespawn = respawnDelayTicks / 20;
@@ -95,6 +96,7 @@ public abstract class DeathScreenMixin extends Screen {
 			}
 
 			this.buttons.clear();
+			this.buttons.removeAll(buttons);
 			if(showRespawnButton || showTitleScreenButton) {
 				//Respawn or spectate button
 				if(showRespawnButton) {
