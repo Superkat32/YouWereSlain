@@ -226,7 +226,7 @@ public abstract class DeathScreenMixin extends Screen {
 			}
 
 			int fadeNoSoftlockText = softlockWasPrevented ? defaultFadeDelay : 0;
-			if(ticksSinceDeath >= fadeNoSoftlockText && softlockWasPrevented) {
+			if(ticksSinceDeath >= fadeNoSoftlockText && softlockWasPrevented && INSTANCE.getConfig().showPreventedSoftlockMessage) {
 				Text prevented = Text.translatable("youwereslain.nosoftlock.prevented");
 				Text help = Text.translatable("youwereslain.nosoftlock.help");
 				float alpha = (float) Math.min(1.0, (float) ticksSinceDeath / fade);

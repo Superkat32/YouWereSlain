@@ -16,12 +16,10 @@ import java.nio.file.Path;
 
 public class YouWereSlainConfig {
 
-//    public static final ConfigInstance<YouWereSlainConfig> INSTANCE = new GsonConfigInstance<>(YouWereSlainConfig.class, Path.of("./config/youwereslain.json"));
     public static final GsonConfigInstance<YouWereSlainConfig> INSTANCE = GsonConfigInstance.<YouWereSlainConfig>createBuilder(YouWereSlainConfig.class)
         .setPath(Path.of("./config/youwereslain.json")).build();
 
-    @ConfigEntry
-    public String deathMessage = "You were slain...";
+    @ConfigEntry public String deathMessage = "You were slain...";
     @ConfigEntry public Color deathMessageColor = new Color(240, 130, 132);
     @ConfigEntry public boolean fadeInDeathMessage = true;
     @ConfigEntry public boolean deathReason = true;
@@ -48,6 +46,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public String emergencyRespawnMessage = "Emergency respawn button activating in <time> seconds";
     @ConfigEntry public boolean disableHud = false;
     @ConfigEntry public boolean modEnabled = true;
+    @ConfigEntry public boolean showPreventedSoftlockMessage = true;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -432,7 +431,20 @@ public class YouWereSlainConfig {
                     )
                     .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
+            var showPreventedSoftlockMessage = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("youwereslain.nosoftlock.showmessage"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.nosoftlock.showmessage.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.showPreventedSoftlockMessage,
+                            () -> config.showPreventedSoftlockMessage,
+                            val -> config.showPreventedSoftlockMessage = val
+                    )
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             extrasGroup.option(modEnabled);
+            extrasGroup.option(showPreventedSoftlockMessage);
             extrasCategoryBuilder.group(extrasGroup.build());
 
             return builder

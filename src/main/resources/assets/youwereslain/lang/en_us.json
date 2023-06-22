@@ -73,6 +73,8 @@
 
   "youwereslain.enabled": "Mod Enabled",
   "youwereslain.enabled.tooltip": "If enabled, the death screen will use options from the \"Death Screen\" category. If disabled, the death screen will look like vanilla Minecraft's death screen.",
+  "youwereslain.nosoftlock.showmessage": "Show Prevented Softlock Message",
+  "youwereslain.nosoftlock.showmessage.tooltip": "If respawn delay, show respawn button, and show title screen button config options are disabled, it is possible to get softlocked(unable to respawn). However, this mod attempt to prevent that from happening. If a softlock was prevented, a message at the bottom of the death screen will appear. Disabling this config option disables that text.",
 
   "youwereslain.nosoftlock.prevented": "A possible softlock has been prevented",
   "youwereslain.nosoftlock.help": "Please check your config and enable respawn delay or any button"
