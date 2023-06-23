@@ -76,7 +76,10 @@
   "youwereslain.nosoftlock.showmessage": "Show Prevented Softlock Message",
   "youwereslain.nosoftlock.showmessage.tooltip": "If respawn delay, show respawn button, and show title screen button config options are disabled, it is possible to get softlocked(unable to respawn). However, this mod attempt to prevent that from happening. If a softlock was prevented, a message at the bottom of the death screen will appear. Disabling this config option disables that text.",
   "youwereslain.fadeinworkaround": "Multiplayer Fade In Workaround",
-  "youwereslain.fadeinworkaround.tooltip": "If a text fades in when connected to a multiplayer server, it flickers once, then restarts the fade in animation back to how it should go. This is due to how Minecraft handles the death screen. With this option enabled, it disables that flickering by adding extra delay time before starting the fade in. This only affects you if you playing in a multiplayer environment.",
+  "youwereslain.fadeinworkaround.tooltip": "In very specific multiplayer environments, fading in text will sometimes flicker. If this option is enabled, it attempts to workaround the flickering by adding extra time to the delay before the fade in.",
+  "youwereslain.hidehudworkaround": "Multiplayer Hide HUD Workaround",
+  "youwereslain.hidehudworkaround.tooltip": "In very specific multiplayer environments, the Hide HUD Upon Death option bugs out. It almost never unhides the HUD when it should. If this option is enabled, it attempts to workaround the hidden HUD bug by always unhiding it, even if the HUD was hidden before death.",
+  "youwereslain.workarounds.note": "§7I was only able to reproduce this bug using a specific server software on a specific Minecraft version. On other software, it seemingly never happened. Using the same software on newer Minecraft versions also seemed to fix the issue. However, if it was on a slightly older version of Minecraft, it bugged out.",
 
   "youwereslain.nosoftlock.prevented": "A possible softlock has been prevented",
   "youwereslain.nosoftlock.help": "Please check your config and enable respawn delay or any button"

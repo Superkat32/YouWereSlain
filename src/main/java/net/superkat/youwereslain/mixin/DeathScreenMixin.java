@@ -46,6 +46,7 @@ public class DeathScreenMixin extends Screen {
 	public boolean shiftIsHeldDown = false;
 	public int ticksSinceShiftPress;
 	public int ticksSinceDeath;
+	public int buttonActivationTicks;
 	String respawnMessage = INSTANCE.getConfig().respawningMessage;
 	public int ticksUntilRespawn;
 	public int secondsUntilRespawn;
@@ -62,6 +63,7 @@ public class DeathScreenMixin extends Screen {
 	private final List<ButtonWidget> buttons = Lists.newArrayList();
 	public boolean modEnabled = INSTANCE.getConfig().modEnabled;
 	public boolean softlockWasPrevented = false;
+	public boolean hasHudBeenDeterminedOnce = false;
 	public DeathScreenMixin() {
 		super(Text.of(""));
 	}
@@ -76,12 +78,12 @@ public class DeathScreenMixin extends Screen {
 	private void init(CallbackInfo ci) {
 		if(modEnabled) {
 			ci.cancel();
-			ticksSinceDeath = 0;
-			ticksUntilRespawn = respawnDelayTicks;
-			secondsUntilRespawn = respawnDelayTicks / 20;
-			ticksToSeconds = 0;
-			ticksSinceShiftPress = 0;
-			wasHudHidden = this.client.options.hudHidden;
+			LOGGER.info("was init");
+			if(!hasHudBeenDeterminedOnce) {
+				wasHudHidden = this.client.options.hudHidden;
+				hasHudBeenDeterminedOnce = true;
+			}
+			buttonActivationTicks = 0; //In here instead of in the onDisplayed() because this method(init) is called when the window gets resized
 
 			//Prevent softlock with config options
 			if(!showRespawnButton && !showTitleScreenButton && !INSTANCE.getConfig().shouldRespawnDelay) {
@@ -127,6 +129,16 @@ public class DeathScreenMixin extends Screen {
 	}
 
 	@Override
+	public void onDisplayed() {
+		super.onDisplayed();
+		ticksSinceDeath = 0;
+		ticksUntilRespawn = respawnDelayTicks;
+		secondsUntilRespawn = respawnDelayTicks / 20;
+		ticksToSeconds = 0;
+		ticksSinceShiftPress = 0;
+	}
+
+	@Override
 	public boolean shouldCloseOnEsc() {
 		return false;
 	}
@@ -169,6 +181,8 @@ public class DeathScreenMixin extends Screen {
         LOGGER.info("wasHudHidden: " + wasHudHidden);
         LOGGER.info("hudwasHiddenByMod: " + hudWasHiddenByMod);
 		if(!wasHudHidden && hudWasHiddenByMod) {
+			this.client.options.hudHidden = false;
+		} else if(INSTANCE.getConfig().hideHudWorkaround && !client.isInSingleplayer()) {
 			this.client.options.hudHidden = false;
 		}
 	}
@@ -311,6 +325,7 @@ public class DeathScreenMixin extends Screen {
 			//Counting ticks stuff
 //			super.tick();
 			++this.ticksSinceDeath;
+			++this.buttonActivationTicks;
 			++this.ticksToSeconds;
 			--this.ticksUntilRespawn;
 
@@ -354,7 +369,7 @@ public class DeathScreenMixin extends Screen {
 			}
 
 			//Respawning
-			if(ticksSinceDeath == 20) {
+			if(buttonActivationTicks == 20) {
 				this.setButtonsActive(true);
 			}
 			if (this.ticksUntilRespawn == 0 && INSTANCE.getConfig().shouldRespawnDelay) {

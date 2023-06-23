@@ -47,7 +47,8 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean disableHud = false;
     @ConfigEntry public boolean modEnabled = true;
     @ConfigEntry public boolean showPreventedSoftlockMessage = true;
-    @ConfigEntry public boolean fadeInWorkaround = true;
+    @ConfigEntry public boolean fadeInWorkaround = false;
+    @ConfigEntry public boolean hideHudWorkaround = false;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -448,6 +449,7 @@ public class YouWereSlainConfig {
                     .name(Text.translatable("youwereslain.fadeinworkaround"))
                     .description(OptionDescription.createBuilder()
                             .text(Text.translatable("youwereslain.fadeinworkaround.tooltip"))
+                            .text(Text.translatable("youwereslain.workarounds.note"))
                             .build())
                     .binding(
                             defaults.fadeInWorkaround,
@@ -456,9 +458,23 @@ public class YouWereSlainConfig {
                     )
                     .customController(booleanOption -> new BooleanController(booleanOption, true))
                     .build();
+            var hideHudWorkaround = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("youwereslain.hidehudworkaround"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.hidehudworkaround.tooltip"))
+                            .text(Text.translatable("youwereslain.workarounds.note"))
+                            .build())
+                    .binding(
+                            defaults.hideHudWorkaround,
+                            () -> config.hideHudWorkaround,
+                            val -> config.hideHudWorkaround = val
+                    )
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             extrasGroup.option(modEnabled);
             extrasGroup.option(showPreventedSoftlockMessage);
             extrasGroup.option(fadeInWorkaround);
+            extrasGroup.option(hideHudWorkaround);
             extrasCategoryBuilder.group(extrasGroup.build());
 
             return builder
