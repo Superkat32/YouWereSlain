@@ -1,0 +1,8 @@
+{
+  "death": {
+    "subtitle": "sound.youwereslain.death",
+    "sounds": [
+      "youwereslain:death"
+    ]
+  }
+}

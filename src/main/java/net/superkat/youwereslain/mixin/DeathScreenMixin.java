@@ -7,10 +7,12 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.*;
 import net.minecraft.client.gui.screen.option.MouseOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.superkat.youwereslain.YouWereSlainMain;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -318,6 +320,12 @@ public class DeathScreenMixin extends Screen {
 
 			//Respawning message
 			this.respawnText = Text.of(respawnMessage.replaceAll("<time>", String.valueOf(secondsUntilRespawn)));
+
+			//Sound
+			boolean soundEnabled = true;
+			if(ticksSinceDeath == 3 && soundEnabled) {
+				this.client.getSoundManager().play(PositionedSoundInstance.master(YouWereSlainMain.DEATH_SOUND_EVENT, 1.0f, 5.0f));
+			}
 
 			//HUD disabling
 			if(ticksUntilRespawn == respawnDelayTicks - 1 && INSTANCE.getConfig().disableHud) {
