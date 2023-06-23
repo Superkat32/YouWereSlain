@@ -27,18 +27,6 @@ import static net.superkat.youwereslain.YouWereSlainMain.LOGGER;
 @Environment(EnvType.CLIENT)
 @Mixin(DeathScreen.class)
 public class DeathScreenMixin extends Screen {
-	//Welcome to the most spaghetti of spaghetti code there is
-
-	//KNOWN COMPATIBILITIES
-	//You're in Grave Danger
-	//Universal Graves
-	//Gravestones
-	//Forgotten Graves
-	//Your Items Are Safe
-	//Better Respawn
-
-	//KNOWN INCOMPATIBILITIES
-	//Respawn Delay(turns the player into a spectator instead of seeing the death screen upon death)
 
 	public boolean showRespawnButton = INSTANCE.getConfig().respawnButton;
 	public boolean showTitleScreenButton = INSTANCE.getConfig().titleScreenButton;
