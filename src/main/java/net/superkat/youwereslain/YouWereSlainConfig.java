@@ -7,6 +7,7 @@ import dev.isxander.yacl3.config.ConfigEntry;
 import dev.isxander.yacl3.config.GsonConfigInstance;
 import dev.isxander.yacl3.gui.controllers.BooleanController;
 import dev.isxander.yacl3.gui.controllers.ColorController;
+import dev.isxander.yacl3.gui.controllers.slider.FloatSliderController;
 import dev.isxander.yacl3.gui.controllers.slider.IntegerSliderController;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -49,6 +50,8 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean showPreventedSoftlockMessage = true;
     @ConfigEntry public boolean fadeInWorkaround = false;
     @ConfigEntry public boolean hideHudWorkaround = false;
+    @ConfigEntry public boolean deathSound = true;
+    @ConfigEntry public float soundVolume = 1.0f;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -475,7 +478,40 @@ public class YouWereSlainConfig {
             extrasGroup.option(showPreventedSoftlockMessage);
             extrasGroup.option(fadeInWorkaround);
             extrasGroup.option(hideHudWorkaround);
+
+            var packGroup = OptionGroup.createBuilder()
+                    .name(Text.translatable("youwereslain.pack.group"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.pack.group.tooltip"))
+                            .build());
+            var deathSound = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("youwereslain.sound"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.sound.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.deathSound,
+                            () -> config.deathSound,
+                            val -> config.deathSound = val
+                    )
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
+            var soundVolume = Option.<Float>createBuilder()
+                    .name(Text.translatable("youwereslain.sound.volume"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.sound.volume.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.soundVolume,
+                            () -> config.soundVolume,
+                            val -> config.soundVolume = val
+                    )
+                    .customController(opt -> new <Float>FloatSliderController(opt, 0.10f, 1.0f, 0.05f))
+                    .build();
+            packGroup.option(deathSound);
+            packGroup.option(soundVolume);
             extrasCategoryBuilder.group(extrasGroup.build());
+            extrasCategoryBuilder.group(packGroup.build());
 
             return builder
                     .title(Text.translatable("youwereslain.title"))

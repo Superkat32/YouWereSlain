@@ -55,7 +55,7 @@ public class DeathScreenMixin extends Screen {
 	public boolean modEnabled = INSTANCE.getConfig().modEnabled;
 	public boolean softlockWasPrevented = false;
 	public boolean hasHudBeenDeterminedOnce = false;
-	SoundInstance soundInstance = PositionedSoundInstance.master(YouWereSlainMain.DEATH_SOUND_EVENT, 1.0f, 1.0f);
+	SoundInstance soundInstance = PositionedSoundInstance.master(YouWereSlainMain.DEATH_SOUND_EVENT, 1.0f, INSTANCE.getConfig().soundVolume);
 	public DeathScreenMixin() {
 		super(Text.of(""));
 	}
@@ -183,8 +183,7 @@ public class DeathScreenMixin extends Screen {
 		}
 
 		//stop song
-		boolean songEnabled = true;
-		if(songEnabled) {
+		if(INSTANCE.getConfig().deathSound) {
 			this.client.getSoundManager().stop(soundInstance);
 		}
 	}
@@ -335,8 +334,7 @@ public class DeathScreenMixin extends Screen {
 			this.respawnText = Text.of(respawnMessage.replaceAll("<time>", String.valueOf(secondsUntilRespawn)));
 
 			//Sound
-			boolean soundEnabled = true;
-			if(ticksSinceDeath == 3 && soundEnabled) {
+			if(ticksSinceDeath == 3 && INSTANCE.getConfig().deathSound) {
 				this.client.getSoundManager().play(soundInstance);
 			}
 
