@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screen.*;
 import net.minecraft.client.gui.screen.option.MouseOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -54,6 +55,7 @@ public class DeathScreenMixin extends Screen {
 	public boolean modEnabled = INSTANCE.getConfig().modEnabled;
 	public boolean softlockWasPrevented = false;
 	public boolean hasHudBeenDeterminedOnce = false;
+	SoundInstance soundInstance = PositionedSoundInstance.master(YouWereSlainMain.DEATH_SOUND_EVENT, 1.0f, 1.0f);
 	public DeathScreenMixin() {
 		super(Text.of(""));
 	}
@@ -90,8 +92,7 @@ public class DeathScreenMixin extends Screen {
 				if(showRespawnButton) {
 					this.buttons.add((ButtonWidget)this.addDrawableChild(ButtonWidget.builder(this.hardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), (button) -> {
 						this.client.player.requestRespawn();
-						unhideHUD();
-						sendDeathCoords();
+						respawnReset();
 						button.active = false;
 					}).dimensions(this.width / 2 - 100, this.height / 4 + 72, 200, 20).build()));
 				}
@@ -100,7 +101,6 @@ public class DeathScreenMixin extends Screen {
 				if(showTitleScreenButton) {
 					this.buttons.add((ButtonWidget) this.addDrawableChild(ButtonWidget.builder(Text.translatable("deathScreen.titleScreen"), (button) -> {
 						this.client.getAbuseReportContext().tryShowDraftScreen(this.client, this, this::titleScreenWasClicked, true);
-						unhideHUD();
 					}).dimensions(this.width / 2 - 100, this.height / 4 + 96, 200, 20).build()));
 				}
 				this.setButtonsActive(false);
@@ -149,6 +149,7 @@ public class DeathScreenMixin extends Screen {
 					this.quitLevel();
 				} else {
 					this.client.player.requestRespawn();
+					respawnReset();
 					this.client.setScreen((Screen)null);
 				}
 
@@ -166,13 +167,25 @@ public class DeathScreenMixin extends Screen {
 		this.client.setScreen(new TitleScreen());
 	}
 
-	private void unhideHUD() {
-        LOGGER.info("wasHudHidden: " + wasHudHidden);
-        LOGGER.info("hudwasHiddenByMod: " + hudWasHiddenByMod);
+	public void respawnReset() {
+		//unhide HUD
+		LOGGER.info("wasHudHidden: " + wasHudHidden);
+		LOGGER.info("hudwasHiddenByMod: " + hudWasHiddenByMod);
 		if(!wasHudHidden && hudWasHiddenByMod) {
 			this.client.options.hudHidden = false;
 		} else if(INSTANCE.getConfig().hideHudWorkaround && !client.isInSingleplayer()) {
 			this.client.options.hudHidden = false;
+		}
+
+		//send death coords
+		if(INSTANCE.getConfig().sendCoordsInChat) {
+			this.client.player.sendMessage(Text.literal(deathCoordsMessage).formatted(Formatting.RED));
+		}
+
+		//stop song
+		boolean songEnabled = true;
+		if(songEnabled) {
+			this.client.getSoundManager().stop(soundInstance);
 		}
 	}
 
@@ -324,7 +337,7 @@ public class DeathScreenMixin extends Screen {
 			//Sound
 			boolean soundEnabled = true;
 			if(ticksSinceDeath == 3 && soundEnabled) {
-				this.client.getSoundManager().play(PositionedSoundInstance.master(YouWereSlainMain.DEATH_SOUND_EVENT, 1.0f, 5.0f));
+				this.client.getSoundManager().play(soundInstance);
 			}
 
 			//HUD disabling
@@ -350,8 +363,7 @@ public class DeathScreenMixin extends Screen {
 					this.buttons.add((ButtonWidget)this.addDrawableChild(ButtonWidget.builder(this.hardcore ? Text.translatable("deathScreen.spectate") : Text.translatable("deathScreen.respawn"), (button) -> {
 						this.client.player.requestRespawn();
 						this.client.setScreen(null);
-						unhideHUD();
-						sendDeathCoords();
+						respawnReset();
 						button.active = false;
 					}).dimensions(this.width / 2 - 100, this.height / 4 + 72, 200, 20).build()));
 				} else if(MouseOptionsScreen.hasShiftDown() && overrideButtonOptions) {
@@ -369,8 +381,7 @@ public class DeathScreenMixin extends Screen {
 			}
 			if (this.ticksUntilRespawn == 0 && INSTANCE.getConfig().shouldRespawnDelay) {
 				this.client.player.requestRespawn();
-				unhideHUD();
-				sendDeathCoords();
+				respawnReset();
 			}
 		} else {
 			return;
