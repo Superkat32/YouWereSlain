@@ -66,7 +66,6 @@ public class DeathScreenMixin extends Screen {
 	private void init(CallbackInfo ci) {
 		if(modEnabled) {
 			ci.cancel();
-			LOGGER.info("was init");
 			if(!hasHudBeenDeterminedOnce) {
 				wasHudHidden = this.client.options.hudHidden;
 				hasHudBeenDeterminedOnce = true;
