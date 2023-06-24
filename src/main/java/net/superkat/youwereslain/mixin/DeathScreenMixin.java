@@ -337,6 +337,9 @@ public class DeathScreenMixin extends Screen {
 			if(ticksSinceDeath == 3 && INSTANCE.getConfig().deathSound) {
 				this.client.getSoundManager().play(soundInstance);
 			}
+			if(ticksSinceDeath > 5 && INSTANCE.getConfig().loopSound && !this.client.getSoundManager().isPlaying(soundInstance)) {
+				this.client.getSoundManager().play(soundInstance);
+			}
 
 			//HUD disabling
 			if(ticksUntilRespawn == respawnDelayTicks - 1 && INSTANCE.getConfig().disableHud) {

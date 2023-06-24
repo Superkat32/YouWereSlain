@@ -52,6 +52,7 @@ public class YouWereSlainConfig {
     @ConfigEntry public boolean hideHudWorkaround = false;
     @ConfigEntry public boolean deathSound = true;
     @ConfigEntry public float soundVolume = 1.0f;
+    @ConfigEntry public boolean loopSound = false;
 
     public static Screen makeScreen(Screen parent) {
         return YetAnotherConfigLib.create(INSTANCE, (defaults, config, builder) -> {
@@ -508,8 +509,21 @@ public class YouWereSlainConfig {
                     )
                     .customController(opt -> new <Float>FloatSliderController(opt, 0.10f, 1.0f, 0.05f))
                     .build();
+            var loopSound = Option.<Boolean>createBuilder()
+                    .name(Text.translatable("youwereslain.sound.loop"))
+                    .description(OptionDescription.createBuilder()
+                            .text(Text.translatable("youwereslain.sound.loop.tooltip"))
+                            .build())
+                    .binding(
+                            defaults.loopSound,
+                            () -> config.loopSound,
+                            val -> config.loopSound = val
+                    )
+                    .customController(booleanOption -> new BooleanController(booleanOption, true))
+                    .build();
             packGroup.option(deathSound);
             packGroup.option(soundVolume);
+            packGroup.option(loopSound);
             extrasCategoryBuilder.group(extrasGroup.build());
             extrasCategoryBuilder.group(packGroup.build());
 

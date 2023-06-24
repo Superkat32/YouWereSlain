@@ -81,7 +81,7 @@
   "youwereslain.workarounds.note": "§7I was only able to reproduce this bug using a specific server software on a specific Minecraft version. On other software, it seemingly never happened. Using the same software on newer Minecraft versions also seemed to fix the issue. However, if it was on a slightly older version of Minecraft, it bugged out.",
 
   "youwereslain.pack.group": "Resource Pack Options",
-  "youwereslain.pack.group.tooltip": "Options related to resource packs and You Were Slain",
+  "youwereslain.pack.group.tooltip": "Options related to resource packs and You Were Slain. Please refer to the wiki for more information.",
   "youwereslain.sound": "Death Sound",
   "youwereslain.sound.tooltip": "Should there be a resource pack-editable sound that plays upon death? If no resource pack edits this sound, nothing will be heard, as the default sound is silent.",
   "youwereslain.sound.volume": "Death Sound Volume",
