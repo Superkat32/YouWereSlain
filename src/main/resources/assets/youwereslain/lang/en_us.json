@@ -91,6 +91,7 @@
   "youwereslain.sound.loop.tooltip": "Loop the death sound effect until respawn",
 
   "youwereslain.nosoftlock.prevented": "A possible softlock has been prevented",
-  "youwereslain.nosoftlock.help": "Please check your config and enable respawn delay or any button"
+  "youwereslain.nosoftlock.help": "Please check your config and enable respawn delay or any button",
+  "sound.youwereslain.death": "Death"
 }
 
