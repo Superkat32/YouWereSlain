@@ -16,7 +16,6 @@ public class YouWereSlainMain implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        LOGGER.info("You were slain has been loaded");
         Registry.register(Registries.SOUND_EVENT, YouWereSlainMain.DEATH_SOUND_ID, DEATH_SOUND_EVENT);
     }
 }

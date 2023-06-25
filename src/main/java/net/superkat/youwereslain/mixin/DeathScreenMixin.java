@@ -169,8 +169,6 @@ public class DeathScreenMixin extends Screen {
 
 	public void respawnReset() {
 		//unhide HUD
-		LOGGER.info("wasHudHidden: " + wasHudHidden);
-		LOGGER.info("hudwasHiddenByMod: " + hudWasHiddenByMod);
 		if(!wasHudHidden && hudWasHiddenByMod) {
 			this.client.options.hudHidden = false;
 		} else if(INSTANCE.getConfig().hideHudWorkaround && !client.isInSingleplayer()) {
