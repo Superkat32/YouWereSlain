@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "youwereslain",
 	"version": "${version}",
-	"name": "You were slain...",
+	"name": "You Were Slain",
 	"description": "Customize the death screen unlike ever before!",
 	"authors": [
 		"Superkat32"
