@@ -299,12 +299,6 @@ public class DeathScreenMixin extends Screen {
 		}
 	}
 
-	private void sendDeathCoords() {
-		if(INSTANCE.getConfig().sendCoordsInChat) {
-			this.client.player.sendMessage(Text.literal(deathCoordsMessage).formatted(Formatting.RED));
-		}
-	}
-
 	@Nullable
 	private Style getTextComponentUnderMouse(int mouseX) {
 		if (this.deathReasonMessage == null) {
