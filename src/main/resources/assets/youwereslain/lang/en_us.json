@@ -53,7 +53,7 @@
   "youwereslain.delay.tooltip": "The delay(in seconds) until you respawn after death",
   "youwereslain.respawnmessage": "Respawning Message",
   "youwereslain.respawnmessage.tooltip": "The message telling you how long you have until you respawn",
-  "youwereslain.respawnmessage.tooltip.time": "<time> is the seconds left until you respawn",
+  "youwereslain.respawnmessage.tooltip.time": "Use \"<time>\" for the seconds left until you respawn",
   "youwereslain.respawnmessage.color": "Respawn Message Color",
   "youwereslain.respawnmessage.fadein": "Fade In Respawn Message",
   "youwereslain.respawnmessage.fadein.tooltip": "Fades in the respawn message",
@@ -61,6 +61,7 @@
   "youwereslain.delayoverride.tooltip": "Enable the ability to hold shift on the death screen to activate an emergency respawn button",
   "youwereslain.emergencyrespawn": "Emergency Respawn Message",
   "youwereslain.emergencyrespawn.tooltip": "Text that alerts the user they are about to activate the emergency respawn button",
+  "youwereslain.emergencyrespawn.tooltip.time": "Use \"<time>\" for the seconds left until the emergency respawn button appears",
   "youwereslain.hud": "Hide HUD Upon Death",
   "youwereslain.hud.tooltip": "If the HUD isn't hidden upon death, this option will hide it until respawning",
 
@@ -86,6 +87,8 @@
   "youwereslain.sound.tooltip": "Should there be a resource pack-editable sound that plays upon death? If no resource pack edits this sound, nothing will be heard, as the default sound is silent.",
   "youwereslain.sound.volume": "Death Sound Volume",
   "youwereslain.sound.volume.tooltip": "Controls the volume of the death sound. Also note that the master volume slider affects the volume.",
+  "youwereslain.sound.loop": "Loop Death Sound",
+  "youwereslain.sound.loop.tooltip": "Loop the death sound effect until respawn",
 
   "youwereslain.nosoftlock.prevented": "A possible softlock has been prevented",
   "youwereslain.nosoftlock.help": "Please check your config and enable respawn delay or any button"

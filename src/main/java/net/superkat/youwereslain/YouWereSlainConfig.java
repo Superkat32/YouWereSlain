@@ -378,6 +378,7 @@ public class YouWereSlainConfig {
                     .name(Text.translatable("youwereslain.emergencyrespawn"))
                     .description(OptionDescription.createBuilder()
                             .text(Text.translatable("youwereslain.emergencyrespawn.tooltip"))
+                            .text(Text.translatable("youwereslain.emergencyrespawn.tooltip.time"))
                             .build())
                     .binding(
                             defaults.emergencyRespawnMessage,
